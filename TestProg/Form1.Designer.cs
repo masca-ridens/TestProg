@@ -182,6 +182,7 @@
             this.numSymbolRate = new System.Windows.Forms.NumericUpDown();
             this.rtbWhiteboard = new System.Windows.Forms.RichTextBox();
             this.bMERTbs = new System.Windows.Forms.Button();
+            this.bMERDcs = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -1860,6 +1861,7 @@
             // 
             // tpMER
             // 
+            this.tpMER.Controls.Add(this.bMERDcs);
             this.tpMER.Controls.Add(this.numAverages);
             this.tpMER.Controls.Add(this.label30);
             this.tpMER.Controls.Add(this.dgvMERs);
@@ -2137,6 +2139,16 @@
             this.bMERTbs.UseVisualStyleBackColor = true;
             this.bMERTbs.Click += new System.EventHandler(this.bMERTbs_Click);
             // 
+            // bMERDcs
+            // 
+            this.bMERDcs.Location = new System.Drawing.Point(311, 22);
+            this.bMERDcs.Name = "bMERDcs";
+            this.bMERDcs.Size = new System.Drawing.Size(75, 45);
+            this.bMERDcs.TabIndex = 18;
+            this.bMERDcs.Text = "DCS MER";
+            this.bMERDcs.UseVisualStyleBackColor = true;
+            this.bMERDcs.Click += new System.EventHandler(this.bMERDcs_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2379,6 +2391,7 @@
         private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.ComboBox cbVoaAddress;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button bMERDcs;
     }
 }
 

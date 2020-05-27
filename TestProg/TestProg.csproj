@@ -37,10 +37,10 @@
       <HintPath>..\Agilent.SA.Vsa.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Broadcom_lib">
-      <HintPath>..\..\Class Libraries\Broadcom_lib\Broadcom_lib\bin\Debug\Broadcom_lib.dll</HintPath>
+      <HintPath>H:\Software\C#\Class Libraries\Broadcom_lib\Broadcom_lib\bin\Debug\Broadcom_lib.dll</HintPath>
     </Reference>
     <Reference Include="lib_Win32DeviceManagement">
-      <HintPath>..\..\Class Libraries\Win32DeviceManagement_lib\lib_Win32DeviceManagement\bin\Release\lib_Win32DeviceManagement.dll</HintPath>
+      <HintPath>H:\Software\C#\Class Libraries\Win32DeviceManagement_lib\lib_Win32DeviceManagement\bin\Release\lib_Win32DeviceManagement.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Registry, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Registry.4.6.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>

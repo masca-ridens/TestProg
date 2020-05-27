@@ -24,6 +24,17 @@ namespace TestProg
         readonly string resultsFile = Path.Combine(myDesktop, "results.txt");
         bool automaticSwitching = true;
 
+        Dictionary<int, string> SpectrumAnalyserMode = new Dictionary<int, string>()
+            {
+                {1, "Spectrum Analyzer" },
+                {2, "Real Time Spectrum Analyzer" },
+                {8, @"I//Q Analyzer (Basic)" },
+                {14, "Phase Noise" },
+                {101, "89601 VSA" },
+                { 219, "Noise Figure"},
+                {234, "Analog Demod" }
+            };
+
         public Form1()
         {
             InitializeComponent();
@@ -1525,100 +1536,11 @@ namespace TestProg
 
             // Prepare the spectrum analyser...
 
-            Dictionary<int, string> SpectrumAnalyserMode = new Dictionary<int, string>()
-            {
-                {1, "Spectrum Analyzer" },
-                {2, "Real Time Spectrum Analyzer" },
-                {8, @"I//Q Analyzer (Basic)" },
-                {14, "Phase Noise" },
-                {101, "89601 VSA" },
-                { 219, "Noise Figure"},
-                {234, "Analog Demod" }
-            };
-
             Binstrument_Click(bSA, new EventArgs());
             int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
 
-            // -----------------------------  Confirm the VSA process is running  ---------------------------------------------
+            int selectedTraceNo = Setup89601VSA();
 
-            instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
-            string s = instruments[SpecAn1].ReadString();
-            rtbWhiteboard.AppendText("VSA returns " + s);
-
-            instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
-            //instruments[SpecAn1].WriteString("INSTrument: SELect?");
-            //string q = instruments[SpecAn1].ReadString();
-
-            // --------------------  Set up the displays etc.  -----------------------------------------------------------
-
-            instruments[SpecAn1].WriteString(":DISPlay:ENABle 1");
-            instruments[SpecAn1].WriteString(":DISPlay:ENABle?");
-            string q = instruments[SpecAn1].ReadString() == "1" ? "Display is on" : "Display is off";
-            rtbWhiteboard.AppendText(q + Environment.NewLine);
-
-            // Turn auto-cal off so that it doesn't run when it is not expected 
-            // (which could result in timeouts when using SCPI without long enough timeout values).
-
-            instruments[SpecAn1].WriteString(":CAL:AUTO 0");
-            instruments[SpecAn1].WriteString(":CAL:AUTO?");
-            q = instruments[SpecAn1].ReadString() == "1" ? "Auto-cal is on" : "Auto-cal is off";
-            rtbWhiteboard.AppendText(q + Environment.NewLine);
-
-            // ---------------------     Setup the Digital Demod Measurement   ------------------------------------
-
-            //instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod");
-            //instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod:NDEFault");
-            //instruments[SpecAn1].WriteString(":INITiate:DDEMod");
-
-            instruments[SpecAn1].WriteString("INPut:DATA HW");   // Hardware rather than simulated input
-            instruments[SpecAn1].WriteString(":INPut:DATA?");
-            rtbWhiteboard.AppendText("Data is coming from " + instruments[SpecAn1].ReadString());
-
-            //instruments[SpecAn1].WriteString("DDEM:MOD PSK8");
-            instruments[SpecAn1].WriteString("DDEM:MOD?");
-            rtbWhiteboard.AppendText("Modulation is " + instruments[SpecAn1].ReadString());
-
-            //instruments[SpecAn1].WriteString(":DDEM:FILT:REF RECT");
-            //instruments[SpecAn1].WriteString(":DDEM:FILT?");
-            //rtbWhiteboard.AppendText("The filter is " + instruments[SpecAn1].ReadString());
-
-            //instruments[SpecAn1].WriteString(":DDEM:SRAT" + numSymbolRate.Value.ToString() + "MHZ");
-            //instruments[SpecAn1].WriteString(":DDEM:SRAT?");
-            //string reply = instruments[SpecAn1].ReadString().TrimEnd('\n').Replace("+", "");
-            //if (decimal.TryParse(reply, out decimal symbolRate))
-            //{
-            //    symbolRate /= 1E6m;
-            //    rtbWhiteboard.AppendText("The symbol rate is " + symbolRate + " MS/s" + Environment.NewLine);
-            //}
-            //else rtbWhiteboard.AppendText("The symbol rate is not readable" + Environment.NewLine);
-
-            instruments[SpecAn1].WriteString(":FREQ:CENT?");
-            decimal centre = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
-            rtbWhiteboard.AppendText("The centre frequency is " + centre.ToString() + " MHz" + Environment.NewLine);
-            instruments[SpecAn1].WriteString(":FREQuency:SPAN 60 MHz");
-            instruments[SpecAn1].WriteString(":FREQ:SPAN?");
-            decimal span = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
-            rtbWhiteboard.AppendText("The frequency span is " + span.ToString() + " MHz" + Environment.NewLine);
-            rtbWhiteboard.Refresh();
-            rtbWhiteboard.Update();
-
-            // ---------------------------   Seek the MER Trace  -----------------------------------------------------
-
-            instruments[SpecAn1].WriteString("TRACe:COUNt?");
-            int traceCount = int.Parse(instruments[SpecAn1].ReadString());
-            int selectedTraceNo = 0;   // NB not a valid trace
-            for (int t = 1; t <= traceCount; t++)
-            {
-                instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
-                string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
-                MessageBox.Show(tName);
-                if (tName.Contains("\"Syms/Errs\""))
-                {
-                    selectedTraceNo = t;
-                    rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
-                    break;
-                }
-            }
             if (selectedTraceNo == 0)
             {
                 rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
@@ -1727,5 +1649,188 @@ namespace TestProg
             RenameResultsFile("MER-TBS", ports, serialNumber, test, temperature);
             return;
         }
+        
+        private int Setup89601VSA()
+        {
+            Binstrument_Click(bSA, new EventArgs());
+            int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
+
+            // -----------------------------  Confirm the VSA process is running  ---------------------------------------------
+
+            instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
+            string s = instruments[SpecAn1].ReadString();
+            rtbWhiteboard.AppendText("VSA returns " + s);
+
+            instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
+            //instruments[SpecAn1].WriteString("INSTrument: SELect?");
+            //string q = instruments[SpecAn1].ReadString();
+
+            // --------------------  Set up the displays etc.  -----------------------------------------------------------
+
+            instruments[SpecAn1].WriteString(":DISPlay:ENABle 1");
+            instruments[SpecAn1].WriteString(":DISPlay:ENABle?");
+            string q = instruments[SpecAn1].ReadString() == "1" ? "Display is on" : "Display is off";
+            rtbWhiteboard.AppendText(q + Environment.NewLine);
+
+            // Turn auto-cal off so that it doesn't run when it is not expected 
+            // (which could result in timeouts when using SCPI without long enough timeout values).
+
+            instruments[SpecAn1].WriteString(":CAL:AUTO 0");
+            instruments[SpecAn1].WriteString(":CAL:AUTO?");
+            q = instruments[SpecAn1].ReadString() == "1" ? "Auto-cal is on" : "Auto-cal is off";
+            rtbWhiteboard.AppendText(q + Environment.NewLine);
+
+            // ---------------------     Setup the Digital Demod Measurement   ------------------------------------
+
+            instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod");
+            instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod:NDEFault");
+            instruments[SpecAn1].WriteString(":INITiate:DDEMod");
+
+            instruments[SpecAn1].WriteString("INPut:DATA HW");   // Hardware rather than simulated input
+            instruments[SpecAn1].WriteString(":INPut:DATA?");
+            rtbWhiteboard.AppendText("Data is coming from " + instruments[SpecAn1].ReadString());
+
+            instruments[SpecAn1].WriteString("DDEM:MOD PSK8");
+            instruments[SpecAn1].WriteString("DDEM:MOD?");
+            rtbWhiteboard.AppendText("Modulation is " + instruments[SpecAn1].ReadString());
+
+            instruments[SpecAn1].WriteString(":DDEM:FILT:REF RECT");
+            instruments[SpecAn1].WriteString(":DDEM:FILT?");
+            rtbWhiteboard.AppendText("The filter is " + instruments[SpecAn1].ReadString());
+
+            instruments[SpecAn1].WriteString(":DDEM:SRAT" + numSymbolRate.Value.ToString() + "MHZ");
+            instruments[SpecAn1].WriteString(":DDEM:SRAT?");
+            string reply = instruments[SpecAn1].ReadString().TrimEnd('\n').Replace("+", "");
+            if (decimal.TryParse(reply, out decimal symbolRate))
+            {
+                symbolRate /= 1E6m;
+                rtbWhiteboard.AppendText("The symbol rate is " + symbolRate + " MS/s" + Environment.NewLine);
+            }
+            else rtbWhiteboard.AppendText("The symbol rate is not readable" + Environment.NewLine);
+
+            instruments[SpecAn1].WriteString(":FREQ:CENT?");
+            decimal centre = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
+            rtbWhiteboard.AppendText("The centre frequency is " + centre.ToString() + " MHz" + Environment.NewLine);
+            instruments[SpecAn1].WriteString(":FREQuency:SPAN 60 MHz");
+            instruments[SpecAn1].WriteString(":FREQ:SPAN?");
+            decimal span = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
+            rtbWhiteboard.AppendText("The frequency span is " + span.ToString() + " MHz" + Environment.NewLine);
+            rtbWhiteboard.Refresh();
+            rtbWhiteboard.Update();
+
+            // ---------------------------   Seek the MER Trace  -----------------------------------------------------
+
+            instruments[SpecAn1].WriteString("TRACe:COUNt?");
+            int traceCount = int.Parse(instruments[SpecAn1].ReadString());
+            int selectedTraceNo = 0;   // NB not a valid trace
+            for (int t = 1; t <= traceCount; t++)
+            {
+                instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
+                string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
+                if (tName.Contains("Syms/Errs"))
+                {
+                    selectedTraceNo = t;
+                    rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
+                    break;
+                }
+            }
+            return selectedTraceNo;
+        }
+
+        private void bMERDcs_Click(object sender, EventArgs e)
+        {
+            // Gather the basic parameters of the test...
+
+            char temperature = PreliminaryActions("TBS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
+            string opticalPower = "-15dBm";
+            File.AppendAllText(resultsFile, "Optical input power  = " + opticalPower + Environment.NewLine);
+
+            File.AppendAllText(resultsFile,
+                "LNB".PadRight(4)
+                + "Pol.".PadRight(6)
+                + "Rx".PadRight(4)
+                + "Input_MHz".PadRight(17)
+                + "Output_MHz".PadRight(17)
+                + "MER_dB" + Environment.NewLine);
+
+            // Set each Rx to CHANNEL-STACKED and disable TDMA polling...
+            foreach (int r in ports)
+            {
+                bool success = FSK.SetStackingMode(usb, r, "ChannelStacked");
+                if (!success) MessageBox.Show("Failed to set C/S mode for Rx " + r.ToString());
+
+                success = FSK.DisableTdmaPolling(usb, 'F', r, true);
+                if (!success) MessageBox.Show("Failed to disable TDMA polling for Rx " + r.ToString());
+
+                success = FSK.DisableTdmaPolling(usb, 'F', r, true);
+                if (!success) MessageBox.Show("Failed to disable TDMA polling for Rx " + r.ToString());
+                else MessageBox.Show("Successfully disabled TDMA polling for Rx " + r.ToString());
+            }
+
+            // Prepare the spectrum analyser...
+
+            Binstrument_Click(bSA, new EventArgs());
+            int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
+
+            int selectedTraceNo = Setup89601VSA();
+
+            if (selectedTraceNo == 0)
+            {
+                rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
+                return;
+            }
+            string traceName = "TRACE" + selectedTraceNo;
+
+            // -------------------------  Setup the transponder frequencies  ------------------------------
+
+            List<decimal> lowerTransponders = new List<decimal>();
+            List<decimal> upperTransponders = new List<decimal>();
+            for (decimal tp = numFirstLower.Value; tp < 1450; tp += numLowerStep.Value)
+            {
+                lowerTransponders.Add(tp);
+            }
+
+            for (decimal tp = numFirstUpper.Value; tp < 2150; tp += numUpperStep.Value)
+            {
+                upperTransponders.Add(tp);
+            }
+
+            // Create a datatable for the results and bind it to the dgv
+
+            System.Data.DataTable mers = new System.Data.DataTable();
+            mers.Columns.Add("Frequency", typeof(decimal));
+            mers.Columns.Add("MER(dB)", typeof(double));
+            dgvMERs.DataSource = mers;
+            dgvMERs.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dgvMERs.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            foreach (int r in ports)
+            {
+                // Route the proper port to the spectrum analyser...
+
+                try
+                {
+                    var rb = gbPickering.Controls.OfType<RadioButton>().FirstOrDefault(k => k.Tag.ToString() == r.ToString());
+                    (rb as RadioButton).Checked = true;
+                    Pickering_CheckedChanged((rb as RadioButton), new EventArgs());
+                }
+                catch
+                {
+                    MessageBox.Show("Connect Rx " + r.ToString());
+                }
+
+                foreach (string l in lnbs)
+                {
+                    if (chIntervene.Checked)
+                        MessageBox.Show("Attach LNB " + l);
+
+
+                    foreach (bool isUpper in new[] { false, true })
+                    {
+
+                    }
+                }
+            }
+                    }
     }
 }
