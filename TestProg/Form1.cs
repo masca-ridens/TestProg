@@ -24,7 +24,7 @@ namespace TestProg
         readonly string resultsFile = Path.Combine(myDesktop, "results.txt");
         bool automaticSwitching = true;
 
-        Dictionary<int, string> SpectrumAnalyserMode = new Dictionary<int, string>()
+        readonly Dictionary<int, string> SpectrumAnalyserMode = new Dictionary<int, string>()
             {
                 {1, "Spectrum Analyzer" },
                 {2, "Real Time Spectrum Analyzer" },
@@ -1324,7 +1324,7 @@ namespace TestProg
 
                 else MessageBox.Show("Connect Rx port " + r.ToString());
 
-                // Allocate all channels to current LNB...
+                // Allocate all channels to current Rx...
 
                 for (int ch = 0; ch < 18; ch++)
                 {
@@ -1600,7 +1600,7 @@ namespace TestProg
                             // Set up the Destacker
                             bool success = FSK.Command38(usb, 'D', r, l, null, null, isUpper, b);
 
-                            rtbWhiteboard.AppendText("Measuring at port " + r.ToString() + ", from LNB " + l + (isUpper? " Upper, ": " Lower, ") + "to " + b + Environment.NewLine);
+                            rtbWhiteboard.AppendText("Measuring at port " + r.ToString() + ", from LNB " + l + (isUpper ? " Upper, " : " Lower, ") + "to " + b + Environment.NewLine);
                             rtbWhiteboard.Refresh();
                             rtbWhiteboard.Update();
 
@@ -1649,7 +1649,7 @@ namespace TestProg
             RenameResultsFile("MER-TBS", ports, serialNumber, test, temperature);
             return;
         }
-        
+
         private int Setup89601VSA()
         {
             Binstrument_Click(bSA, new EventArgs());
@@ -1819,18 +1819,96 @@ namespace TestProg
                     MessageBox.Show("Connect Rx " + r.ToString());
                 }
 
+                // Allocate all channels to current Rx...
+
+                for (int ch = 0; ch < 18; ch++)
+                {
+                    _ = FSK.DeallocateChannel(usb, 'F', r, ch);
+                    bool success = FSK.AllocateChannel(usb, 'F', r, ch);
+                    if (!success) MessageBox.Show("Failed to allocate channel " + ch.ToString());
+                }
                 foreach (string l in lnbs)
                 {
                     if (chIntervene.Checked)
                         MessageBox.Show("Attach LNB " + l);
 
+                    // read grid...
+
+                    List<int> grid = FSK.RequestUserBlockGrid(usb, 'F', r).ToList<int>();
+                    List<decimal> centreFrequencies = new List<decimal>();
+                    int noUserBands = 16;
+                    for (int i = 0; i < noUserBands; i++)
+                    {
+                        centreFrequencies.Add(grid[0] + i * grid[1]);
+                    }
 
                     foreach (bool isUpper in new[] { false, true })
                     {
+                        // Set the progress bar up...
+                        progressBar1.Maximum = lnbs.Count * ports.Count * 2 * noUserBands;
 
+                        foreach (decimal inputFrequency in (isUpper ? upperTransponders : lowerTransponders))
+                        {
+                            // Send the current tp to every UB...
+
+                            int KHz = Convert.ToInt32(1000 * inputFrequency);
+                            if (l == "C" && isUpper)
+                                KHz += 28500;       // Neither understand nor like this. Must add 28.5 MHz!
+
+                            for (int ch = 0; ch < 18; ch++)
+                            {
+                                bool success = FSK.Command38(usb, 'F', r, l, ch, KHz, isUpper, null);
+                                if (!success) MessageBox.Show("Failed to allocate frequency to channel " + ch.ToString());
+                            }
+
+                            rtbWhiteboard.AppendText("Measuring at port " + r.ToString() + ", from LNB " + l + (isUpper ? " Upper, " : " Lower, ") + Environment.NewLine);
+                            rtbWhiteboard.Refresh();
+                            rtbWhiteboard.Update();
+
+                            foreach (decimal ub in centreFrequencies)
+                            {
+                                //  ---------------------  Take the measurements  ---------------------------------------
+
+                                string dataRow = l.PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4);
+
+                                string message = string.Format(":FREQuency:CENTer {0} MHz", ub);
+                                instruments[SpecAn1].WriteString(message);
+                                instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
+                                string discard = instruments[SpecAn1].ReadString();
+
+                                double[] temp = new double[(int)numAverages.Value];
+                                try
+                                {
+                                    for (int av = 0; av < (int)numAverages.Value; av++)
+                                    {
+                                        Thread.Sleep(100);
+                                        instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
+                                        instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
+                                        temp[av] = double.Parse(instruments[SpecAn1].ReadString());
+                                    }
+                                }
+                                catch (COMException ex)
+                                {
+                                    MessageBox.Show(ex.ToString());
+                                    return;
+                                }
+                                mers.Rows.Add(ub.ToString(), Math.Round(temp.Average(), 2));
+                                dgvMERs.Refresh();
+                                dgvMERs.Update();
+
+                                // Save results to a file...
+
+                                dataRow += ub.ToString().PadRight(17) + inputFrequency.ToString().PadRight(17) + Math.Round(temp.Average(), 2);
+                                File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
+                                progressBar1.Value += 1;
+                            }
+                        }
                     }
                 }
             }
-                    }
+            File.AppendAllText(resultsFile, Environment.NewLine + "Finished at " + DateTime.Now);
+            RenameResultsFile("MER-DCS", ports, serialNumber, test, temperature);
+            System.Media.SystemSounds.Beep.Play();
+        }
     }
 }
