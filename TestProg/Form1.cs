@@ -583,8 +583,12 @@ namespace TestProg
             File.AppendAllText(resultsFile, DateTime.Now.ToString() + Environment.NewLine);
             File.AppendAllText(resultsFile, serialNumber + Environment.NewLine);
             File.AppendAllText(resultsFile, "Test is: " + test + Environment.NewLine);
-            File.AppendAllText(resultsFile, "Power into Stacker is " + power + Environment.NewLine);
-            File.AppendAllText(resultsFile, "Frequency step is " + numStep.Value.ToString() + " MHz" + Environment.NewLine);
+            if (!test.ToUpper().Contains("MER"))
+            {
+                File.AppendAllText(resultsFile, "Power into Stacker is " + power + Environment.NewLine);
+                File.AppendAllText(resultsFile, "Frequency step is " + numStep.Value.ToString() + " MHz" + Environment.NewLine);
+
+            }
             File.AppendAllText(resultsFile, (chIntervene.Checked ? "Intervention" : "No intervention") + Environment.NewLine);
             File.AppendAllText(resultsFile, type + " mode" + Environment.NewLine);
             File.AppendAllText(resultsFile, "Temperature is " + temperature + Environment.NewLine + Environment.NewLine);
@@ -1512,7 +1516,7 @@ namespace TestProg
         {
             // Gather the basic parameters of the test...
 
-            char temperature = PreliminaryActions("TBS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
+            char temperature = PreliminaryActions("MER-TBS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
             string opticalPower = "-15dBm";
 
             File.AppendAllText(resultsFile,
@@ -1741,7 +1745,7 @@ namespace TestProg
         {
             // Gather the basic parameters of the test...
 
-            char temperature = PreliminaryActions("TBS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
+            char temperature = PreliminaryActions("MER-DCS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
             string opticalPower = "-15dBm";
             File.AppendAllText(resultsFile, "Optical input power  = " + opticalPower + Environment.NewLine);
 
@@ -1795,6 +1799,16 @@ namespace TestProg
                 upperTransponders.Add(tp);
             }
 
+            // read grid...
+
+            List<int> grid = FSK.RequestUserBlockGrid(usb, 'F', ports[0]).ToList<int>();
+            List<decimal> centreFrequencies = new List<decimal>();
+            int noUserBands = 16;
+            for (int i = 0; i < noUserBands; i++)
+            {
+                centreFrequencies.Add(grid[0] + i * grid[1]);
+            }
+
             // Create a datatable for the results and bind it to the dgv
 
             System.Data.DataTable mers = new System.Data.DataTable();
@@ -1803,6 +1817,9 @@ namespace TestProg
             dgvMERs.DataSource = mers;
             dgvMERs.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dgvMERs.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            // Set the progress bar max...
+            progressBar1.Maximum = lnbs.Count * ports.Count * (lowerTransponders.Count + upperTransponders.Count) * noUserBands;
 
             foreach (int r in ports)
             {
@@ -1827,26 +1844,14 @@ namespace TestProg
                     bool success = FSK.AllocateChannel(usb, 'F', r, ch);
                     if (!success) MessageBox.Show("Failed to allocate channel " + ch.ToString());
                 }
+
                 foreach (string l in lnbs)
                 {
                     if (chIntervene.Checked)
                         MessageBox.Show("Attach LNB " + l);
 
-                    // read grid...
-
-                    List<int> grid = FSK.RequestUserBlockGrid(usb, 'F', r).ToList<int>();
-                    List<decimal> centreFrequencies = new List<decimal>();
-                    int noUserBands = 16;
-                    for (int i = 0; i < noUserBands; i++)
-                    {
-                        centreFrequencies.Add(grid[0] + i * grid[1]);
-                    }
-
                     foreach (bool isUpper in new[] { false, true })
                     {
-                        // Set the progress bar up...
-                        progressBar1.Maximum = lnbs.Count * ports.Count * 2 * noUserBands;
-
                         foreach (decimal inputFrequency in (isUpper ? upperTransponders : lowerTransponders))
                         {
                             // Send the current tp to every UB...
@@ -1864,6 +1869,8 @@ namespace TestProg
                             rtbWhiteboard.AppendText("Measuring at port " + r.ToString() + ", from LNB " + l + (isUpper ? " Upper, " : " Lower, ") + Environment.NewLine);
                             rtbWhiteboard.Refresh();
                             rtbWhiteboard.Update();
+                            rtbWhiteboard.SelectionStart = rtbWhiteboard.Text.Length;
+                            rtbWhiteboard.ScrollToCaret();
 
                             foreach (decimal ub in centreFrequencies)
                             {
@@ -1874,7 +1881,12 @@ namespace TestProg
                                 string message = string.Format(":FREQuency:CENTer {0} MHz", ub);
                                 instruments[SpecAn1].WriteString(message);
                                 instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
-                                string discard = instruments[SpecAn1].ReadString();
+                                _ = instruments[SpecAn1].ReadString();
+
+                                message = ":INPUT ANALOG:RANGE:AUTO";
+                                instruments[SpecAn1].WriteString(message);
+                                instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
+                                _ = instruments[SpecAn1].ReadString();
 
                                 double[] temp = new double[(int)numAverages.Value];
                                 try
@@ -1895,6 +1907,7 @@ namespace TestProg
                                 mers.Rows.Add(ub.ToString(), Math.Round(temp.Average(), 2));
                                 dgvMERs.Refresh();
                                 dgvMERs.Update();
+                                dgvMERs.FirstDisplayedScrollingRowIndex = dgvMERs.RowCount - 1;
 
                                 // Save results to a file...
 
@@ -1909,6 +1922,132 @@ namespace TestProg
             File.AppendAllText(resultsFile, Environment.NewLine + "Finished at " + DateTime.Now);
             RenameResultsFile("MER-DCS", ports, serialNumber, test, temperature);
             System.Media.SystemSounds.Beep.Play();
+        }
+
+        private void BMerDbs_Click(object sender, EventArgs e)
+        {
+            // Gather the basic parameters of the test...
+
+            char temperature = PreliminaryActions("MER-DBS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
+            string opticalPower = "-15dBm";
+            File.AppendAllText(resultsFile, "Optical input power  = " + opticalPower + Environment.NewLine);
+
+            File.AppendAllText(resultsFile,
+                "LNB".PadRight(4)
+                + "Pol.".PadRight(6)
+                + "Rx".PadRight(4)
+                + "Input_MHz".PadRight(17)
+                + "Output_MHz".PadRight(17)
+                + "MER_dB" + Environment.NewLine);
+
+            // Sort out the ProgressBar...
+            progressBar1.Maximum = ports.Count * bands.Count;
+
+            // Prepare the spectrum analyser...
+
+            Binstrument_Click(bSA, new EventArgs());
+            int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
+
+            int selectedTraceNo = Setup89601VSA();
+
+            if (selectedTraceNo == 0)
+            {
+                rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
+                return;
+            }
+            string traceName = "TRACE" + selectedTraceNo;
+
+            // -------------------------  Setup the transponder frequencies  ------------------------------
+
+            List<decimal> transponders = new List<decimal>();
+            for (decimal tp = numFirstLower.Value; tp < 1450; tp += numLowerStep.Value)
+            {
+                transponders.Add(tp);
+            }
+
+            for (decimal tp = numFirstUpper.Value; tp < 2150; tp += numUpperStep.Value)
+            {
+                transponders.Add(tp);
+            }
+
+            progressBar1.Maximum *= transponders.Count;
+
+            // Create a datatable for the results and bind it to the dgv
+
+            System.Data.DataTable mers = new System.Data.DataTable();
+            mers.Columns.Add("Frequency", typeof(decimal));
+            mers.Columns.Add("MER(dB)", typeof(double));
+            dgvMERs.DataSource = mers;
+            dgvMERs.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dgvMERs.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            foreach (int r in new int[] { 1, 2, 3 })
+            {
+                // Route the proper port to the spectrum analyser...
+
+                try
+                {
+                    var rb = gbPickering.Controls.OfType<RadioButton>().FirstOrDefault(k => k.Tag.ToString() == r.ToString());
+                    (rb as RadioButton).Checked = true;
+                    Pickering_CheckedChanged((rb as RadioButton), new EventArgs());
+                }
+                catch
+                {
+                    MessageBox.Show("Connect Rx " + r.ToString());
+                }
+                MessageBox.Show("Attach LNB " + r.ToString());
+
+                foreach (bool isUpper in new[] { false, true })
+                {
+                    string b = isUpper ? "Mid" : "Low";
+                    rtbWhiteboard.AppendText("Measuring at port " + r.ToString() + (isUpper ? " Upper, " : " Lower, ") + "to " + b + Environment.NewLine);
+                    rtbWhiteboard.Refresh();
+                    rtbWhiteboard.Update();
+
+                    //  ---------------------  Take the measurements  ---------------------------------------
+
+                    foreach (decimal tp in transponders)
+                    {
+                        string dataRow = opticalPower.PadRight(10) + r.ToString().PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4) + b.PadRight(7);
+
+                        string message = string.Format(":FREQuency:CENTer {0} MHz", tp);
+                        instruments[SpecAn1].WriteString(message);
+                        instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
+                        string discard = instruments[SpecAn1].ReadString();
+
+                        double[] temp = new double[(int)numAverages.Value];
+                        try
+                        {
+                            for (int av = 0; av < (int)numAverages.Value; av++)
+                            {
+                                Thread.Sleep(100);
+                                instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
+                                instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
+                                temp[av] = double.Parse(instruments[SpecAn1].ReadString());
+                            }
+                        }
+                        catch (COMException ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                            return;
+                        }
+                        mers.Rows.Add(tp.ToString(), Math.Round(temp.Average(), 2));
+                        dgvMERs.Refresh();
+                        dgvMERs.Update();
+
+                        // Save results to a file...
+
+                        dataRow += tp.ToString().PadRight(17) + Math.Round(temp.Average(), 2);
+                        File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
+                        progressBar1.Value += 1;
+                    }
+                }
+                File.AppendAllText(resultsFile, "-----------------------------------------------------" + Environment.NewLine);
+
+            }
+            RenameResultsFile("MER-DBS", ports, serialNumber, test, temperature);
+            System.Media.SystemSounds.Beep.Play();
+            return;
         }
     }
 }

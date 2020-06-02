@@ -160,6 +160,7 @@
             this.bImDbs = new System.Windows.Forms.Button();
             this.bIMTbs = new System.Windows.Forms.Button();
             this.tpMER = new System.Windows.Forms.TabPage();
+            this.bMERDcs = new System.Windows.Forms.Button();
             this.numAverages = new System.Windows.Forms.NumericUpDown();
             this.label30 = new System.Windows.Forms.Label();
             this.dgvMERs = new System.Windows.Forms.DataGridView();
@@ -182,7 +183,7 @@
             this.numSymbolRate = new System.Windows.Forms.NumericUpDown();
             this.rtbWhiteboard = new System.Windows.Forms.RichTextBox();
             this.bMERTbs = new System.Windows.Forms.Button();
-            this.bMERDcs = new System.Windows.Forms.Button();
+            this.bMerDbs = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -1861,6 +1862,7 @@
             // 
             // tpMER
             // 
+            this.tpMER.Controls.Add(this.bMerDbs);
             this.tpMER.Controls.Add(this.bMERDcs);
             this.tpMER.Controls.Add(this.numAverages);
             this.tpMER.Controls.Add(this.label30);
@@ -1879,6 +1881,16 @@
             this.tpMER.TabIndex = 4;
             this.tpMER.Text = "MER";
             this.tpMER.UseVisualStyleBackColor = true;
+            // 
+            // bMERDcs
+            // 
+            this.bMERDcs.Location = new System.Drawing.Point(214, 73);
+            this.bMERDcs.Name = "bMERDcs";
+            this.bMERDcs.Size = new System.Drawing.Size(75, 45);
+            this.bMERDcs.TabIndex = 18;
+            this.bMERDcs.Text = "DCS MER";
+            this.bMERDcs.UseVisualStyleBackColor = true;
+            this.bMERDcs.Click += new System.EventHandler(this.bMERDcs_Click);
             // 
             // numAverages
             // 
@@ -2139,15 +2151,15 @@
             this.bMERTbs.UseVisualStyleBackColor = true;
             this.bMERTbs.Click += new System.EventHandler(this.bMERTbs_Click);
             // 
-            // bMERDcs
+            // bMerDbs
             // 
-            this.bMERDcs.Location = new System.Drawing.Point(311, 22);
-            this.bMERDcs.Name = "bMERDcs";
-            this.bMERDcs.Size = new System.Drawing.Size(75, 45);
-            this.bMERDcs.TabIndex = 18;
-            this.bMERDcs.Text = "DCS MER";
-            this.bMERDcs.UseVisualStyleBackColor = true;
-            this.bMERDcs.Click += new System.EventHandler(this.bMERDcs_Click);
+            this.bMerDbs.Location = new System.Drawing.Point(214, 124);
+            this.bMerDbs.Name = "bMerDbs";
+            this.bMerDbs.Size = new System.Drawing.Size(75, 45);
+            this.bMerDbs.TabIndex = 19;
+            this.bMerDbs.Text = "DBS MER";
+            this.bMerDbs.UseVisualStyleBackColor = true;
+            this.bMerDbs.Click += new System.EventHandler(this.BMerDbs_Click);
             // 
             // Form1
             // 
@@ -2392,6 +2404,7 @@
         private System.Windows.Forms.ComboBox cbVoaAddress;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button bMERDcs;
+        private System.Windows.Forms.Button bMerDbs;
     }
 }
 

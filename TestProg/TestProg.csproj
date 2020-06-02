@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="Windows_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Class Libraries\Windows_lib\Windows_lib\bin\Debug\Windows_lib.dll</HintPath>
+      <HintPath>H:\Software\C#\Class Libraries\Windows_lib\Windows_lib\bin\Debug\Windows_lib.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
