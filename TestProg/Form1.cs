@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Broadcom_lib;
+using Ivi.Visa.Interop;
+using lib_Win32DeviceManagement;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,11 +9,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Broadcom_lib;
-using Ivi.Visa.Interop;
-using lib_Win32DeviceManagement;
 
 namespace TestProg
 {
@@ -271,7 +270,7 @@ namespace TestProg
             try
             {
                 IVisaSession session = null;
-                session = ioMgr.Open(address, AccessMode.NO_LOCK, 3000, "");
+                session = (IVisaSession)ioMgr.Open(address, AccessMode.NO_LOCK, 3000, "");
 
                 instruments[instruments.Count - 1].IO = (IMessage)session;
                 instruments[instruments.Count - 1].IO.SendEndEnabled = false;
@@ -2049,5 +2048,9 @@ namespace TestProg
             System.Media.SystemSounds.Beep.Play();
             return;
         }
+    }
+
+    internal interface IVisaSession
+    {
     }
 }
