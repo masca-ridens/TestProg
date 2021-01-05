@@ -60,25 +60,25 @@ namespace TestProg
             }
             finally
             {
-                usb = new SerialPort
-                {
-                    PortName = comPort,
-                    ReadTimeout = 250,
-                    WriteTimeout = 250,
-                    BaudRate = 115200,
-                    Parity = Parity.None,
-                    StopBits = StopBits.One,
-                    DataBits = 8,
-                    Handshake = Handshake.None,
-                    NewLine = "\r"
-                };
-                usb.Open();
+                //usb = new SerialPort
+                //{
+                //    PortName = comPort,
+                //    ReadTimeout = 250,
+                //    WriteTimeout = 250,
+                //    BaudRate = 115200,
+                //    Parity = Parity.None,
+                //    StopBits = StopBits.One,
+                //    DataBits = 8,
+                //    Handshake = Handshake.None,
+                //    NewLine = "\r"
+                //};
+                //usb.Open();
             }
 
             cbInstrumentSetup.SelectedIndex = 2;
-            InstrumentSetup_SelectedIndexChanged(cbInstrumentSetup, EventArgs.Empty);
-            BDCOn_Click(bDCOn, new EventArgs());
-            Binstrument_Click(bPickering, new EventArgs());
+            //InstrumentSetup_SelectedIndexChanged(cbInstrumentSetup, EventArgs.Empty);
+            //BDCOn_Click(bDCOn, new EventArgs());
+            //Binstrument_Click(bPickering, new EventArgs());
             tabControl1.SelectedTab = tpMER;
         }
 
@@ -86,8 +86,8 @@ namespace TestProg
         {
             try
             {
-                usb.WriteLine("OE\r");
-                rtb1.AppendText(usb.ReadLine() + Environment.NewLine);
+                //usb.WriteLine("OE\r");
+                //rtb1.AppendText(usb.ReadLine() + Environment.NewLine);
             }
             catch { MessageBox.Show("Multigen timed out"); }
         }
