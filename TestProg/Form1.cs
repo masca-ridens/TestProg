@@ -56,38 +56,43 @@ namespace TestProg
             }
             catch (Exception ex)
             {
-                comPort = "COM9";
+                comPort = "COM7";
             }
             finally
             {
-                //usb = new SerialPort
-                //{
-                //    PortName = comPort,
-                //    ReadTimeout = 250,
-                //    WriteTimeout = 250,
-                //    BaudRate = 115200,
-                //    Parity = Parity.None,
-                //    StopBits = StopBits.One,
-                //    DataBits = 8,
-                //    Handshake = Handshake.None,
-                //    NewLine = "\r"
-                //};
-                //usb.Open();
+                usb = new SerialPort
+                {
+                    PortName = comPort,
+                    ReadTimeout = 250,
+                    WriteTimeout = 250,
+                    BaudRate = 115200,
+                    Parity = Parity.None,
+                    StopBits = StopBits.One,
+                    DataBits = 8,
+                    Handshake = Handshake.None,
+                    NewLine = "\r"
+                };
+                usb.Open();
             }
 
-            cbInstrumentSetup.SelectedIndex = 2;
-            //InstrumentSetup_SelectedIndexChanged(cbInstrumentSetup, EventArgs.Empty);
-            //BDCOn_Click(bDCOn, new EventArgs());
-            //Binstrument_Click(bPickering, new EventArgs());
-            tabControl1.SelectedTab = tpMER;
+            string[] resources = ioMgr.FindRsrc("?*");
+            cbInstrumentSA1.Items.Clear();
+            cbInstrumentSG1.Items.Clear();
+            cbInstrumentSG2.Items.Clear();
+
+            cbInstrumentSA1.Items.AddRange(resources);
+            cbInstrumentSG1.Items.AddRange(resources);
+            cbInstrumentSG2.Items.AddRange(resources);
+
+            tabControl1.SelectedTab = tabPage2;
         }
 
         private void BDCOn_Click(object sender, EventArgs e)
         {
             try
             {
-                //usb.WriteLine("OE\r");
-                //rtb1.AppendText(usb.ReadLine() + Environment.NewLine);
+                usb.WriteLine("OE\r");
+                rtb1.AppendText(usb.ReadLine() + Environment.NewLine);
             }
             catch { MessageBox.Show("Multigen timed out"); }
         }
@@ -259,40 +264,51 @@ namespace TestProg
             Button b = sender as Button;
             if (instrumentLog.Contains(b.Tag.ToString())) return;
             GroupBox gb = b.Parent as GroupBox;
-            var tb = gb.Controls.OfType<TextBox>().FirstOrDefault(r => r.Tag.ToString() == "SCPI");
             var label = gb.Controls.OfType<Label>().FirstOrDefault(r => r.Tag != null && r.Tag.ToString() == "idn?");
+            var cbox = gb.Controls.OfType<ComboBox>().FirstOrDefault(r => r.Tag != null && r.Tag.ToString() == "Instrument");
 
-            string address = tb.Text;
+            // Validate the instrument address...
 
-            instruments.Add(new FormattedIO488());
+            string address = cbox.SelectedItem.ToString();
+            if (string.IsNullOrEmpty(address))
+            {
+                MessageBox.Show("Select an instrument");
+                return;
+            }
+
             instrumentLog.Add(b.Tag.ToString());
+
+            FormattedIO488 instrument = new Ivi.Visa.Interop.FormattedIO488();
 
             try
             {
-                IVisaSession session = null;
-                session = (IVisaSession)ioMgr.Open(address, AccessMode.NO_LOCK, 3000, "");
-
-                instruments[instruments.Count - 1].IO = (IMessage)session;
-                instruments[instruments.Count - 1].IO.SendEndEnabled = false;
-                instruments[instruments.Count - 1].IO.Timeout = 9000;
-                instruments[instruments.Count - 1].IO.TerminationCharacterEnabled = true;
-                instruments[instruments.Count - 1].WriteString("*IDN?");
+                instrument.IO = (IMessage)ioMgr.Open(address, AccessMode.NO_LOCK, 1000, "");
+                instruments.Add(instrument);
+                //instruments[instruments.Count - 1].IO.SendEndEnabled = false;
+                //instruments[instruments.Count - 1].IO.TerminationCharacterEnabled = true;
+                instruments[instruments.Count - 1].WriteString("*IDN?", true);
                 label.Text = instruments[instruments.Count - 1].ReadString();
                 b.Enabled = false;
             }
-            catch (COMException)
+            catch (InvalidCastException ex)
+            {
+                MessageBox.Show("Failed to connect to the Spectrum Analyser at address " + address);
+                rtb1.AppendText(ex.ToString() + Environment.NewLine);
+            }
+            catch (COMException ex)
             {
                 switch (gb.Tag.ToString())
                 {
                     case "SA1":
                         {
-                            MessageBox.Show("Failed to connect to the Spectrum Analyser at address " + tb.Text);
+                            MessageBox.Show("Failed to connect to the Spectrum Analyser at address " + address);
+                            rtb1.AppendText(ex.ToString() + Environment.NewLine);
                             break;
                         }
                     case "SG1":
                     case "SG2":
                         {
-                            MessageBox.Show("Failed to connect to the Signal Generator at address " + tb.Text);
+                            MessageBox.Show("Failed to connect to the Signal Generator at address " + address);
                             break;
                         }
                     case "Pickering":
@@ -1020,8 +1036,8 @@ namespace TestProg
             foreach (CheckBox b in checkedBoxes)
             {
                 rx = Int32.Parse(b.Tag.ToString());
-                if (FSK.TdmaPollingIsOn(usb, 'F', rx)) rtb1.AppendText("TDMA polling is Enabled on port " + rx.ToString() + Environment.NewLine);
-                else rtb1.AppendText("TDMA polling is Disabled on port " + rx.ToString() + Environment.NewLine);
+                //if (FSK.TdmaPollingIsOn(usb, 'F', rx)) rtb1.AppendText("TDMA polling is Enabled on port " + rx.ToString() + Environment.NewLine);
+                //else rtb1.AppendText("TDMA polling is Disabled on port " + rx.ToString() + Environment.NewLine);
             }
         }
         private void RouteSignal(int rx, bool on)
@@ -1479,36 +1495,6 @@ namespace TestProg
                     }
             }
             return answer;
-        }
-
-        private void InstrumentSetup_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch ((sender as ComboBox).SelectedItem)
-            {
-                case "Warehouse":
-                    {
-                        numFixtureLoss1.Value = 15;
-                        numFixtureLoss2.Value = 24;
-                        tbSA1Address.Text = @"TCPIP0::192.168.1.98::inst0::INSTR";
-                        tbSG1Address.Text = @"TCPIP0::192.168.0.204::inst0::INSTR";
-                        tbSG2Address.Text = @"TCPIP0::192.168.1.91::inst0::INSTR";
-                        break;
-                    }
-                case "Home":
-                    {
-                        numFixtureLoss1.Value = 13;
-                        numFixtureLoss2.Value = 13;
-                        tbSA1Address.Text = @"TCPIP0::192.168.1.96::inst0::INSTR";
-                        tbSG1Address.Text = @"TCPIP0::192.168.1.204::inst0::INSTR";
-                        tbSG2Address.Text = @"TCPIP0::192.168.1.91::inst0::INSTR";
-                        break;
-                    }
-                case "MER":
-                    {
-                        tbSA1Address.Text = @"TCPIP0::192.168.0.55::5024::socket";
-                        break;
-                    }
-            }
         }
 
         private void bMERTbs_Click(object sender, EventArgs e)
@@ -2048,9 +2034,5 @@ namespace TestProg
             System.Media.SystemSounds.Beep.Play();
             return;
         }
-    }
-
-    internal interface IVisaSession
-    {
     }
 }

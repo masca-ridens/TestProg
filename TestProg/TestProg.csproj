@@ -32,21 +32,55 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Agilent.SA.Vsa.Interfaces">
       <HintPath>..\Agilent.SA.Vsa.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Broadcom_lib">
-      <HintPath>H:\Software\C#\Class Libraries\Broadcom_lib\Broadcom_lib\bin\Debug\Broadcom_lib.dll</HintPath>
+      <HintPath>..\..\Broadcom_lib\Broadcom_lib\bin\x64\Release\Broadcom_lib.dll</HintPath>
+    </Reference>
+    <Reference Include="Ivi.Driver.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\..\..\Windows\assembly\GAC_64\Ivi.Driver.Interop\1.0.0.0__a128c98f1d7717c1\Ivi.Driver.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Ivi.Visa.Interop, Version=5.9.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\..\..\Windows\assembly\GAC_64\Ivi.Visa.Interop\5.9.0.0__a128c98f1d7717c1\Ivi.Visa.Interop.dll</HintPath>
     </Reference>
     <Reference Include="lib_Win32DeviceManagement">
-      <HintPath>H:\Software\C#\Class Libraries\Win32DeviceManagement_lib\lib_Win32DeviceManagement\bin\Release\lib_Win32DeviceManagement.dll</HintPath>
+      <HintPath>..\..\Win32DeviceManagement_lib\lib_Win32DeviceManagement\bin\x64\Debug\lib_Win32DeviceManagement.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
     </Reference>
+    <Reference Include="Multigen_lib">
+      <HintPath>..\..\Multigen_lib\Multigen_lib\bin\x64\Release\Multigen_lib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Resources.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Security.AccessControl, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Security.AccessControl.4.7.0\lib\net461\System.Security.AccessControl.dll</HintPath>
     </Reference>
@@ -112,15 +146,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="BASICFORMATTEDIOLib">
-      <Guid>{709F7EC2-AB81-11D4-98E6-00108301CB39}</Guid>
-      <VersionMajor>5</VersionMajor>
-      <VersionMinor>12</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="VisaComLib">
       <Guid>{DB8CBF00-D6D3-11D4-AA51-00A024EE30BD}</Guid>
       <VersionMajor>5</VersionMajor>
