@@ -21,7 +21,7 @@ namespace TestProg
         List<string> instrumentLog = new List<string>();
         static readonly string myDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         readonly string resultsFile = Path.Combine(myDesktop, "results.txt");
-        bool automaticSwitching = true;
+        bool automaticSwitching = false;
 
         readonly Dictionary<int, string> SpectrumAnalyserMode = new Dictionary<int, string>()
             {
@@ -79,10 +79,12 @@ namespace TestProg
             cbInstrumentSA1.Items.Clear();
             cbInstrumentSG1.Items.Clear();
             cbInstrumentSG2.Items.Clear();
+            cbInstrumentPickering.Items.Clear();
 
             cbInstrumentSA1.Items.AddRange(resources);
             cbInstrumentSG1.Items.AddRange(resources);
             cbInstrumentSG2.Items.AddRange(resources);
+            cbInstrumentPickering.Items.AddRange(resources);
 
             tabControl1.SelectedTab = tabPage2;
         }
@@ -175,6 +177,14 @@ namespace TestProg
                 rtb1.AppendText("Reset succeeded" + Environment.NewLine);
             else
                 rtb1.AppendText("Reset failed" + Environment.NewLine);
+        }
+
+        private void bSerialNo_Click(object sender, EventArgs e)
+        {
+            string[] serialNo = FSK.ReadSerialNumbers(usb, 'F', 1);
+            rtb1.AppendText("Dish Serial # = " + serialNo[0]);
+            rtb1.AppendText(Environment.NewLine);
+            rtb1.AppendText("GI Serial # = " + serialNo[1] + Environment.NewLine);
         }
 
         private void FrequencySelect_Click(object sender, EventArgs e)
@@ -289,11 +299,6 @@ namespace TestProg
                 instruments[instruments.Count - 1].WriteString("*IDN?", true);
                 label.Text = instruments[instruments.Count - 1].ReadString();
                 b.Enabled = false;
-            }
-            catch (InvalidCastException ex)
-            {
-                MessageBox.Show("Failed to connect to the Spectrum Analyser at address " + address);
-                rtb1.AppendText(ex.ToString() + Environment.NewLine);
             }
             catch (COMException ex)
             {
@@ -590,7 +595,7 @@ namespace TestProg
             if (!success) MessageBox.Show("Failed to unlock at port " + ports[0].ToString());
 
             // Get the serial number...
-            serialNumber = FSK.ReadSerialNumbers(usb, 'F', ports[0]);
+            serialNumber = FSK.ReadSerialNumbers(usb, 'F', ports[0])[1];
             if (string.IsNullOrEmpty(serialNumber)) MessageBox.Show("Failed to get serial number");
 
             decimal power = radioButton1.Checked ? numSGPower1.Value : numSGPower2.Value;
@@ -2034,5 +2039,5 @@ namespace TestProg
             System.Media.SystemSounds.Beep.Play();
             return;
         }
-    }
+            }
 }

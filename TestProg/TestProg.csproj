@@ -56,8 +56,9 @@
     <Reference Include="Agilent.SA.Vsa.Interfaces">
       <HintPath>..\Agilent.SA.Vsa.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="Broadcom_lib">
-      <HintPath>..\..\Broadcom_lib\Broadcom_lib\bin\x64\Release\Broadcom_lib.dll</HintPath>
+    <Reference Include="Broadcom_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Broadcom_lib\Broadcom_lib\bin\x64\Debug\Broadcom_lib.dll</HintPath>
     </Reference>
     <Reference Include="Ivi.Driver.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
