@@ -87,6 +87,8 @@ namespace TestProg
             cbInstrumentPickering.Items.AddRange(resources);
 
             tabControl1.SelectedTab = tabPage2;
+
+            checkBox1.Checked = true;
         }
 
         private void BDCOn_Click(object sender, EventArgs e)
@@ -294,8 +296,8 @@ namespace TestProg
             {
                 instrument.IO = (IMessage)ioMgr.Open(address, AccessMode.NO_LOCK, 1000, "");
                 instruments.Add(instrument);
-                //instruments[instruments.Count - 1].IO.SendEndEnabled = false;
-                //instruments[instruments.Count - 1].IO.TerminationCharacterEnabled = true;
+                instruments[instruments.Count - 1].IO.SendEndEnabled = false;
+                instruments[instruments.Count - 1].IO.TerminationCharacterEnabled = true;
                 instruments[instruments.Count - 1].WriteString("*IDN?", true);
                 label.Text = instruments[instruments.Count - 1].ReadString();
                 b.Enabled = false;
@@ -1570,16 +1572,20 @@ namespace TestProg
             {
                 // Route the proper port to the spectrum analyser...
 
-                try
+                if(automaticSwitching)
                 {
-                    var rb = gbPickering.Controls.OfType<RadioButton>().FirstOrDefault(k => k.Tag.ToString() == r.ToString());
-                    (rb as RadioButton).Checked = true;
-                    Pickering_CheckedChanged((rb as RadioButton), new EventArgs());
+                    try
+                    {
+                        var rb = gbPickering.Controls.OfType<RadioButton>().FirstOrDefault(k => k.Tag.ToString() == r.ToString());
+                        (rb as RadioButton).Checked = true;
+                        Pickering_CheckedChanged((rb as RadioButton), new EventArgs());
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Connect Rx " + r.ToString());
+                    }
                 }
-                catch
-                {
-                    MessageBox.Show("Connect Rx " + r.ToString());
-                }
+                else MessageBox.Show("Connect Rx " + r.ToString());
 
                 foreach (string l in lnbs)
                 {
@@ -1606,8 +1612,8 @@ namespace TestProg
 
                                 string message = string.Format(":FREQuency:CENTer {0} MHz", tp);
                                 instruments[SpecAn1].WriteString(message);
-                                instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
-                                string discard = instruments[SpecAn1].ReadString();
+                                //instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
+                                //string discard = instruments[SpecAn1].ReadString();
 
                                 double[] temp = new double[(int)numAverages.Value];
                                 try
@@ -1615,6 +1621,8 @@ namespace TestProg
                                     for (int av = 0; av < (int)numAverages.Value; av++)
                                     {
                                         Thread.Sleep(100);
+                                        instruments[SpecAn1].WriteString(":init:imm");
+                                        //_ = instruments[SpecAn1].ReadString();
                                         instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
                                         instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
                                         temp[av] = double.Parse(instruments[SpecAn1].ReadString());
@@ -1651,9 +1659,9 @@ namespace TestProg
 
             // -----------------------------  Confirm the VSA process is running  ---------------------------------------------
 
-            instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
-            string s = instruments[SpecAn1].ReadString();
-            rtbWhiteboard.AppendText("VSA returns " + s);
+            //instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
+            //string s = instruments[SpecAn1].ReadString();
+            //rtbWhiteboard.AppendText("VSA returns " + s);
 
             instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
             //instruments[SpecAn1].WriteString("INSTrument: SELect?");
@@ -1719,14 +1727,23 @@ namespace TestProg
             int selectedTraceNo = 0;   // NB not a valid trace
             for (int t = 1; t <= traceCount; t++)
             {
+                try
+                {
                 instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
                 string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
+
                 if (tName.Contains("Syms/Errs"))
                 {
                     selectedTraceNo = t;
                     rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
                     break;
                 }
+                }
+                catch
+                {
+                    continue;
+                }
+
             }
             return selectedTraceNo;
         }
@@ -2039,5 +2056,15 @@ namespace TestProg
             System.Media.SystemSounds.Beep.Play();
             return;
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+                automaticSwitching = checkBox1.Checked ? false : true;
+            foreach (Control ch in gbPickering.Controls)
+            {
+                ch.Enabled = automaticSwitching;
             }
+            (sender as CheckBox).Enabled = true;
+        }
+    }
 }
