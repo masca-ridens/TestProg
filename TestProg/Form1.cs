@@ -1517,11 +1517,12 @@ namespace TestProg
                 + "Pol.".PadRight(6)
                 + "Rx".PadRight(4)
                 + "Band".PadRight(7)
-                + "Input_MHz".PadRight(17)
+                + "Input_MHz".PadRight(12)
+                + "Output_MHz".PadRight(12)
                 + "MER_dB" + Environment.NewLine);
 
             // Sort out the ProgressBar...
-            progressBar1.Maximum = lnbs.Count * ports.Count * 2 * bands.Count;
+            progressBar1.Maximum = lnbs.Count * ports.Count * bands.Count;
 
             // Set each Rx to BANDSTACKED
             foreach (int r in ports)
@@ -1568,6 +1569,8 @@ namespace TestProg
             dgvMERs.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dgvMERs.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
+            decimal specAnCentreFreq = 0;
+
             foreach (int r in ports)
             {
                 // Route the proper port to the spectrum analyser...
@@ -1608,9 +1611,27 @@ namespace TestProg
 
                             foreach (decimal tp in transponders)
                             {
+                                // Ignore frequencies out of band
+
+                                if (isUpper && tp < numFirstUpper.Value)
+                                    continue;
+                                else if (!isUpper && tp > 1450)
+                                    break;
+
+                                // Calculate where the S/A needs to look...
+
+                                if (b == "Low")
+                                    specAnCentreFreq = tp;
+                                else if (b == "Mid")
+                                    specAnCentreFreq = tp + 700;
+                                else if (b == "High")
+                                    specAnCentreFreq = tp + 1550;
+                                if(isUpper)
+                                    specAnCentreFreq -= 700;
+
                                 string dataRow = opticalPower.PadRight(10) + l.PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4) + b.PadRight(7);
 
-                                string message = string.Format(":FREQuency:CENTer {0} MHz", tp);
+                                string message = string.Format(":FREQuency:CENTer {0} MHz", specAnCentreFreq);
                                 instruments[SpecAn1].WriteString(message);
                                 //instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
                                 //string discard = instruments[SpecAn1].ReadString();
@@ -1622,7 +1643,6 @@ namespace TestProg
                                     {
                                         Thread.Sleep(100);
                                         instruments[SpecAn1].WriteString(":init:imm");
-                                        //_ = instruments[SpecAn1].ReadString();
                                         instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
                                         instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
                                         temp[av] = double.Parse(instruments[SpecAn1].ReadString());
@@ -1639,13 +1659,13 @@ namespace TestProg
 
                                 // Save results to a file...
 
-                                dataRow += tp.ToString().PadRight(17) + Math.Round(temp.Average(), 2);
+                                dataRow += tp.ToString().PadRight(12) + specAnCentreFreq.ToString().PadRight(12) + Math.Round(temp.Average(), 2);
                                 File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
                                 progressBar1.Value += 1;
                             }
                         }
                     }
-                    File.AppendAllText(resultsFile, "-----------------------------------------------------");
+                    File.AppendAllText(resultsFile, "----------------------------------------------------------" + Environment.NewLine);
                 }
             }
             RenameResultsFile("MER-TBS", ports, serialNumber, test, temperature);
