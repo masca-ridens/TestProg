@@ -1762,6 +1762,8 @@
             // chIntervene
             // 
             this.chIntervene.AutoSize = true;
+            this.chIntervene.Checked = true;
+            this.chIntervene.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chIntervene.Location = new System.Drawing.Point(8, 57);
             this.chIntervene.Margin = new System.Windows.Forms.Padding(4);
             this.chIntervene.Name = "chIntervene";
@@ -2076,7 +2078,7 @@
             this.numAverages.Size = new System.Drawing.Size(95, 22);
             this.numAverages.TabIndex = 16;
             this.numAverages.Value = new decimal(new int[] {
-            5,
+            50,
             0,
             0,
             0});

@@ -1468,8 +1468,6 @@ namespace TestProg
 
                             File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
                             progressBar1.Value += 1;
-
-
                         }
                     }
                 }
@@ -1575,7 +1573,7 @@ namespace TestProg
             {
                 // Route the proper port to the spectrum analyser...
 
-                if(automaticSwitching)
+                if (automaticSwitching)
                 {
                     try
                     {
@@ -1620,52 +1618,42 @@ namespace TestProg
 
                                 // Calculate where the S/A needs to look...
 
-                                if (b == "Low")
-                                    specAnCentreFreq = tp;
-                                else if (b == "Mid")
-                                    specAnCentreFreq = tp + 700;
-                                else if (b == "High")
-                                    specAnCentreFreq = tp + 1550;
-                                if(isUpper)
-                                    specAnCentreFreq -= 700;
+                                specAnCentreFreq = CalculateDestackerFrequency(tp, isUpper, b);
 
                                 string dataRow = opticalPower.PadRight(10) + l.PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4) + b.PadRight(7);
 
+                                // Set the spectrum analyser frequency...
                                 string message = string.Format(":FREQuency:CENTer {0} MHz", specAnCentreFreq);
                                 instruments[SpecAn1].WriteString(message);
-                                //instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
-                                //string discard = instruments[SpecAn1].ReadString();
 
-                                double[] temp = new double[(int)numAverages.Value];
+                                double merResult;
                                 try
                                 {
-                                    for (int av = 0; av < (int)numAverages.Value; av++)
-                                    {
-                                        Thread.Sleep(100);
-                                        instruments[SpecAn1].WriteString(":init:imm");
-                                        instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
-                                        instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
-                                        temp[av] = double.Parse(instruments[SpecAn1].ReadString());
-                                    }
+                                    PerformSweep(SpecAn1, 50, true);
+                                    // Take a measurement...
+                                    instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
+                                    instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
+                                    merResult = double.Parse(instruments[SpecAn1].ReadString());
                                 }
                                 catch (COMException ex)
                                 {
                                     MessageBox.Show(ex.ToString());
                                     return;
                                 }
-                                mers.Rows.Add(tp.ToString(), Math.Round(temp.Average(), 2));
+                                mers.Rows.Add(tp.ToString(), Math.Round(merResult, 2));
+                                dgvMERs.FirstDisplayedScrollingRowIndex = dgvMERs.RowCount - 1;
                                 dgvMERs.Refresh();
                                 dgvMERs.Update();
 
                                 // Save results to a file...
 
-                                dataRow += tp.ToString().PadRight(12) + specAnCentreFreq.ToString().PadRight(12) + Math.Round(temp.Average(), 2);
+                                dataRow += tp.ToString().PadRight(12) + specAnCentreFreq.ToString().PadRight(12) + Math.Round(merResult, 2);
                                 File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
                                 progressBar1.Value += 1;
                             }
                         }
                     }
-                    File.AppendAllText(resultsFile, "----------------------------------------------------------" + Environment.NewLine);
+                    File.AppendAllText(resultsFile, "------------------------------------------------------------" + Environment.NewLine);
                 }
             }
             RenameResultsFile("MER-TBS", ports, serialNumber, test, temperature);
@@ -1749,15 +1737,15 @@ namespace TestProg
             {
                 try
                 {
-                instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
-                string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
+                    instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
+                    string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
 
-                if (tName.Contains("Syms/Errs"))
-                {
-                    selectedTraceNo = t;
-                    rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
-                    break;
-                }
+                    if (tName.Contains("Syms/Errs"))
+                    {
+                        selectedTraceNo = t;
+                        rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
+                        break;
+                    }
                 }
                 catch
                 {
@@ -2079,12 +2067,112 @@ namespace TestProg
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-                automaticSwitching = checkBox1.Checked ? false : true;
+            automaticSwitching = checkBox1.Checked ? false : true;
             foreach (Control ch in gbPickering.Controls)
             {
                 ch.Enabled = automaticSwitching;
             }
             (sender as CheckBox).Enabled = true;
+        }
+        private decimal CalculateDestackerFrequency(decimal input, bool isUpper, string band)
+        {
+            decimal Lower_Low = 0;
+            decimal Lower_Mid = 705;
+            decimal Lower_High = 1550;
+            decimal Upper_Low = -725;
+            decimal Upper_Mid = 0;
+            decimal Upper_High = 825;
+
+            decimal shift = 0;
+            switch (band)
+            {
+                case "Low":
+                    {
+                        shift = isUpper ? Upper_Low : Lower_Low;
+                        break;
+                    }
+                case "Mid":
+                    {
+                        shift = isUpper ? Upper_Mid : Lower_Mid;
+                        break;
+                    }
+                case "High":
+                    {
+                        shift = isUpper ? Upper_High : Lower_High;
+                        break;
+                    }
+            }
+            return input + shift;
+        }
+        private void CheckStatus(int instrument, out bool measurementDone, out bool autoRanging, out bool calibrating, out bool notPaused)
+        {
+            measurementDone = false;
+            autoRanging = false;
+            calibrating = false;
+            notPaused = false;
+
+            for (int i = 0; i < 100; i++)
+            {
+                instruments[instrument].WriteString("MEAS:STAT?");
+                int status = int.Parse(instruments[instrument].ReadString());
+                if (status < 0) // it is autoranging
+                {
+                    autoRanging = true;
+                    continue;
+                }
+                if ((status & 0x1) == 0x1)
+                {
+                    measurementDone = true;
+                    break;
+                }
+                if ((status & 0x1) == 0x2)
+                {
+                    calibrating = true;
+                    MessageBox.Show("Calibrating. Wait for it to finish.");
+                }
+                if ((status & 0x1073741824) == 0x1073741824)
+                    notPaused = true;
+                continue;
+            }
+
+            //Ranging(-2147483648) A measurement autorange is in progress.
+            //MeasurementDone(1) Measurement is done.
+            //Calibrating(2) Calibration is in progress.
+            //Acquiring(4) The measurement is acquiring data
+            //Settling(8) The measurement is acquiring the settle data(before the measurement data).
+            //WaitPreTrigger(16) The measurement is acquiring pre - trigger data.
+            // WaitTrigger(32) The measurement is waiting for the trigger event.
+            //ReadingData (64) The measurement is reading the acquisition data from the hardware.
+            //Recording(128) The measurement is recording data.
+            //AverageComplete(256) The measurement average is complete.
+            //SyncNotFound(512) No sync is found by the(demodulation) measurement.
+            //PulseNotFound(1024) No pulse is found by the(demodulation) measurement.
+            //CalibrationNeeded(4096) Calibration is needed.
+            //CalibrationWarmUp(8192) Calibration is warming up.
+            //ExternalReferenceLock(16384) The hardware is locked to the external reference.
+            //InternalReferenceLock(32768) The hardware is locked to the internal reference.
+            //GapData(65536) There is a gap between the last scan and the current scan of data.
+            //EndData(131072) Recording playback has reached the end of the data.
+            //TestFail(262144) A test(e.g.LimitTest) has failed.
+            //WaitReferenceLock(524288) The measurement is waiting for a frequency reference lock.
+            //Visible(1048576) The application window is visible
+            //AdcOverload(2097152) The measurement hardware input channel has over-ranged.
+            //StaleData(536870912) Restarting measurement ascquisition because the data is stale(too old).
+            //Measuring(1073741824) - The measurement is not paused(i.e.it is running).
+        }
+        private void PerformSweep(int instrument, int noAverages, bool continuous)
+        {
+            // Set single-sweep mode
+            instruments[instrument].WriteString("INIT:CONT ON");
+
+            // Enable and set AVERAGES...
+            instruments[instrument].WriteString(":SENSE:AVERAGE:STATE 1");
+            instruments[instrument].WriteString(":SENSE:AVERAGE:COUNT " + (int)numAverages.Value);
+            instruments[instrument].WriteString(":SENSe]:AVERage: REPeat 0");   // just the once
+
+            // Autorange the spectrum analyser...this performs the sweep
+            instruments[instrument].WriteString(":ANAL:RANGE:AUTO");
+            CheckStatus(instrument, out bool measurementDone, out bool autoRanging, out bool calibrating, out bool notPaused);
         }
     }
 }
