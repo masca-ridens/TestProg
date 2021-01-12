@@ -46,7 +46,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.bSerialNo = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bCheckPolling = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.gbLNB = new System.Windows.Forms.GroupBox();
             this.rbD = new System.Windows.Forms.RadioButton();
@@ -422,7 +422,7 @@
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.bSerialNo);
-            this.tabPage1.Controls.Add(this.button1);
+            this.tabPage1.Controls.Add(this.bCheckPolling);
             this.tabPage1.Controls.Add(this.groupBox4);
             this.tabPage1.Controls.Add(this.groupBox3);
             this.tabPage1.Controls.Add(this.groupBox1);
@@ -452,16 +452,16 @@
             this.bSerialNo.UseVisualStyleBackColor = true;
             this.bSerialNo.Click += new System.EventHandler(this.bSerialNo_Click);
             // 
-            // button1
+            // bCheckPolling
             // 
-            this.button1.Location = new System.Drawing.Point(361, 305);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 48);
-            this.button1.TabIndex = 18;
-            this.button1.Text = "Check polling";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.bCheckPolling.Location = new System.Drawing.Point(361, 305);
+            this.bCheckPolling.Margin = new System.Windows.Forms.Padding(4);
+            this.bCheckPolling.Name = "bCheckPolling";
+            this.bCheckPolling.Size = new System.Drawing.Size(101, 48);
+            this.bCheckPolling.TabIndex = 18;
+            this.bCheckPolling.Text = "Check polling";
+            this.bCheckPolling.UseVisualStyleBackColor = true;
+            this.bCheckPolling.Click += new System.EventHandler(this.button1_Click);
             // 
             // groupBox4
             // 
@@ -1042,7 +1042,7 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(131, 14);
+            this.checkBox1.Location = new System.Drawing.Point(91, 21);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(166, 21);
             this.checkBox1.TabIndex = 33;
@@ -1066,7 +1066,7 @@
             // radioButton8
             // 
             this.radioButton8.AutoSize = true;
-            this.radioButton8.Location = new System.Drawing.Point(528, 100);
+            this.radioButton8.Location = new System.Drawing.Point(539, 71);
             this.radioButton8.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton8.Name = "radioButton8";
             this.radioButton8.Size = new System.Drawing.Size(17, 16);
@@ -1078,7 +1078,7 @@
             // radioButton7
             // 
             this.radioButton7.AutoSize = true;
-            this.radioButton7.Location = new System.Drawing.Point(528, 71);
+            this.radioButton7.Location = new System.Drawing.Point(539, 45);
             this.radioButton7.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton7.Name = "radioButton7";
             this.radioButton7.Size = new System.Drawing.Size(17, 16);
@@ -1091,7 +1091,7 @@
             // 
             this.radioButton6.AutoSize = true;
             this.radioButton6.Checked = true;
-            this.radioButton6.Location = new System.Drawing.Point(528, 44);
+            this.radioButton6.Location = new System.Drawing.Point(539, 21);
             this.radioButton6.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton6.Name = "radioButton6";
             this.radioButton6.Size = new System.Drawing.Size(17, 16);
@@ -1103,7 +1103,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(468, 98);
+            this.numericUpDown1.Location = new System.Drawing.Point(479, 69);
             this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             6,
@@ -1128,7 +1128,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(381, 103);
+            this.label16.Location = new System.Drawing.Point(392, 74);
             this.label16.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(74, 17);
@@ -1137,7 +1137,7 @@
             // 
             // numSwitch2
             // 
-            this.numSwitch2.Location = new System.Drawing.Point(468, 69);
+            this.numSwitch2.Location = new System.Drawing.Point(479, 43);
             this.numSwitch2.Margin = new System.Windows.Forms.Padding(4);
             this.numSwitch2.Maximum = new decimal(new int[] {
             6,
@@ -1162,7 +1162,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(381, 74);
+            this.label7.Location = new System.Drawing.Point(392, 48);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(74, 17);
@@ -1171,7 +1171,7 @@
             // 
             // numSwitch1
             // 
-            this.numSwitch1.Location = new System.Drawing.Point(468, 41);
+            this.numSwitch1.Location = new System.Drawing.Point(479, 18);
             this.numSwitch1.Margin = new System.Windows.Forms.Padding(4);
             this.numSwitch1.Maximum = new decimal(new int[] {
             6,
@@ -1196,7 +1196,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(381, 41);
+            this.label4.Location = new System.Drawing.Point(392, 18);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(74, 17);
@@ -1218,7 +1218,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(408, 14);
+            this.label5.Location = new System.Drawing.Point(253, 23);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(50, 17);
@@ -1227,7 +1227,7 @@
             // 
             // numCard
             // 
-            this.numCard.Location = new System.Drawing.Point(468, 11);
+            this.numCard.Location = new System.Drawing.Point(313, 20);
             this.numCard.Margin = new System.Windows.Forms.Padding(4);
             this.numCard.Name = "numCard";
             this.numCard.Size = new System.Drawing.Size(43, 22);
@@ -2527,7 +2527,7 @@
         private System.Windows.Forms.Button bSpurTestDbs;
         private System.Windows.Forms.Button bDcsSpurTest;
         private System.Windows.Forms.TabPage tpIM3;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bCheckPolling;
         private System.Windows.Forms.NumericUpDown numSGPower2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.RadioButton radioButton5;
