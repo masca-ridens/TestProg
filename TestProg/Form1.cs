@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using VSA89601_lib;
 
 namespace TestProg
 {
@@ -88,7 +89,7 @@ namespace TestProg
 
             tabControl1.SelectedTab = tabPage2;
 
-            checkBox1.Checked = true;
+            chbManualSwitching.Checked = false;
         }
 
         private void BDCOn_Click(object sender, EventArgs e)
@@ -1504,7 +1505,7 @@ namespace TestProg
 
         private void bMERTbs_Click(object sender, EventArgs e)
         {
-            // Gather the basic parameters of the test...
+            // --------------------- Gather the basic parameters of the test -------------------------------------------
 
             char temperature = PreliminaryActions("MER-TBS", out string test, out List<int> ports, out List<string> lnbs, out List<string> bands, out string serialNumber);
             string opticalPower = "-15dBm";
@@ -1519,28 +1520,41 @@ namespace TestProg
                 + "Output_MHz".PadRight(12)
                 + "MER_dB" + Environment.NewLine);
 
-            // Sort out the ProgressBar...
-            progressBar1.Maximum = lnbs.Count * ports.Count * bands.Count;
+            // ------------------- Set each Rx to BANDSTACKED -----------------------------------------------------------
 
-            // Set each Rx to BANDSTACKED
             foreach (int r in ports)
             {
                 bool success = FSK.SetStackingMode(usb, r, "BandStacked");
                 if (!success) MessageBox.Show("Failed to set BS mode for Rx " + r.ToString());
             }
 
-            // Prepare the spectrum analyser...
+            // ------------------ Prepare the spectrum analyser --------------------------------------------------------
 
             Binstrument_Click(bSA, new EventArgs());
             int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
 
-            int selectedTraceNo = Setup89601VSA();
+            // --------------------- create an instance of a VSA -------------------------------------------------------
+
+            VSA89601 vsa = new VSA89601(cbInstrumentSA1.SelectedItem.ToString());
+
+            rtbWhiteboard.AppendText("VSA process returns " + vsa.QueryVsaRunning() + Environment.NewLine);
+            vsa.DisplayOn = true;
+            vsa.AutoCal = false;
+            vsa.ActiveMeasurement = "DDEMod";
+            vsa.InputMode = "HW";
+            vsa.Modulation = "8PSK";
+            vsa.Baud = "21.5";
+            vsa.Centre = 1000;
+            vsa.Span = 60;
+            int selectedTraceNo = vsa.SeekTrace("Syms/Errs");
 
             if (selectedTraceNo == 0)
             {
                 rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
                 return;
             }
+            else rtbWhiteboard.AppendText("Using trace " + selectedTraceNo.ToString() + Environment.NewLine);
+
             string traceName = "TRACE" + selectedTraceNo;
 
             // -------------------------  Setup the transponder frequencies  ------------------------------
@@ -1556,6 +1570,8 @@ namespace TestProg
                 transponders.Add(tp);
             }
 
+            // ---------------- Sort out the ProgressBar --------------------------------------------------
+            progressBar1.Maximum = lnbs.Count * ports.Count * bands.Count;
             progressBar1.Maximum *= transponders.Count;
 
             // Create a datatable for the results and bind it to the dgv
@@ -1572,7 +1588,6 @@ namespace TestProg
             foreach (int r in ports)
             {
                 // Route the proper port to the spectrum analyser...
-
                 if (automaticSwitching)
                 {
                     try
@@ -1588,6 +1603,8 @@ namespace TestProg
                 }
                 else MessageBox.Show("Connect Rx " + r.ToString());
 
+                rtbWhiteboard.AppendText("Measuring..." + Environment.NewLine);
+
                 foreach (string l in lnbs)
                 {
                     if (chIntervene.Checked)
@@ -1601,52 +1618,35 @@ namespace TestProg
                             // Set up the Destacker
                             bool success = FSK.Command38(usb, 'D', r, l, null, null, isUpper, b);
 
-                            rtbWhiteboard.AppendText("Measuring at port " + r.ToString() + ", from LNB " + l + (isUpper ? " Upper, " : " Lower, ") + "to " + b + Environment.NewLine);
+                            rtbWhiteboard.AppendText("Rx" + r.ToString() + ", from LNB-" + l + (isUpper ? "-Upper, " : "-Lower, ") + "to " + b + Environment.NewLine);
                             rtbWhiteboard.Refresh();
                             rtbWhiteboard.Update();
-
-                            //  ---------------------  Take the measurements  ---------------------------------------
 
                             foreach (decimal tp in transponders)
                             {
                                 // Ignore frequencies out of band
-
                                 if (isUpper && tp < numFirstUpper.Value)
                                     continue;
                                 else if (!isUpper && tp > 1450)
                                     break;
 
                                 // Calculate where the S/A needs to look...
-
                                 specAnCentreFreq = CalculateDestackerFrequency(tp, isUpper, b);
 
                                 string dataRow = opticalPower.PadRight(10) + l.PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4) + b.PadRight(7);
 
                                 // Set the spectrum analyser frequency...
-                                string message = string.Format(":FREQuency:CENTer {0} MHz", specAnCentreFreq);
-                                instruments[SpecAn1].WriteString(message);
+                                vsa.Centre = specAnCentreFreq;
 
                                 double merResult;
-                                try
-                                {
-                                    PerformSweep(SpecAn1, 50, true);
-                                    // Take a measurement...
-                                    instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
-                                    instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
-                                    merResult = double.Parse(instruments[SpecAn1].ReadString());
-                                }
-                                catch (COMException ex)
-                                {
-                                    MessageBox.Show(ex.ToString());
-                                    return;
-                                }
+                                vsa.PerformSweep(50, true);
+                                merResult = vsa.MeasureMER(traceName);
                                 mers.Rows.Add(tp.ToString(), Math.Round(merResult, 2));
                                 dgvMERs.FirstDisplayedScrollingRowIndex = dgvMERs.RowCount - 1;
                                 dgvMERs.Refresh();
                                 dgvMERs.Update();
 
                                 // Save results to a file...
-
                                 dataRow += tp.ToString().PadRight(12) + specAnCentreFreq.ToString().PadRight(12) + Math.Round(merResult, 2);
                                 File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
                                 progressBar1.Value += 1;
@@ -1667,11 +1667,11 @@ namespace TestProg
 
             // -----------------------------  Confirm the VSA process is running  ---------------------------------------------
 
-            //instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
-            //string s = instruments[SpecAn1].ReadString();
-            //rtbWhiteboard.AppendText("VSA returns " + s);
+            instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
+            string s = instruments[SpecAn1].ReadString();
+            rtbWhiteboard.AppendText("VSA returns " + s);
 
-            instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
+            //instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
             //instruments[SpecAn1].WriteString("INSTrument: SELect?");
             //string q = instruments[SpecAn1].ReadString();
 
@@ -2065,9 +2065,9 @@ namespace TestProg
             return;
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void chbManualSwitching_CheckedChanged(object sender, EventArgs e)
         {
-            automaticSwitching = checkBox1.Checked ? false : true;
+            automaticSwitching = chbManualSwitching.Checked ? false : true;
             foreach (Control ch in gbPickering.Controls)
             {
                 ch.Enabled = automaticSwitching;

@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.bUnlock = new System.Windows.Forms.Button();
-            this.rtb1 = new System.Windows.Forms.RichTextBox();
             this.bBS = new System.Windows.Forms.Button();
             this.bCS = new System.Windows.Forms.Button();
             this.bAllocate = new System.Windows.Forms.Button();
@@ -45,8 +44,9 @@
             this.bUbGrid = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.rtb1 = new System.Windows.Forms.RichTextBox();
             this.bSerialNo = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bCheckPolling = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.gbLNB = new System.Windows.Forms.GroupBox();
             this.rbD = new System.Windows.Forms.RadioButton();
@@ -74,6 +74,13 @@
             this.rbL = new System.Windows.Forms.RadioButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.radioButton14 = new System.Windows.Forms.RadioButton();
+            this.radioButton13 = new System.Windows.Forms.RadioButton();
+            this.radioButton9 = new System.Windows.Forms.RadioButton();
+            this.label18 = new System.Windows.Forms.Label();
+            this.nPower = new System.Windows.Forms.NumericUpDown();
             this.cbVoaAddress = new System.Windows.Forms.ComboBox();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
@@ -88,7 +95,7 @@
             this.label20 = new System.Windows.Forms.Label();
             this.bSG2 = new System.Windows.Forms.Button();
             this.gbPickering = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.chbManualSwitching = new System.Windows.Forms.CheckBox();
             this.cbInstrumentPickering = new System.Windows.Forms.ComboBox();
             this.radioButton8 = new System.Windows.Forms.RadioButton();
             this.radioButton7 = new System.Windows.Forms.RadioButton();
@@ -198,6 +205,8 @@
             this.gbBand.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.groupBox9.SuspendLayout();
+            this.groupBox10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nPower)).BeginInit();
             this.groupBox7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFixtureLoss2)).BeginInit();
             this.groupBox8.SuspendLayout();
@@ -248,16 +257,6 @@
             this.bUnlock.Text = "Unlock";
             this.bUnlock.UseVisualStyleBackColor = true;
             this.bUnlock.Click += new System.EventHandler(this.BUnlock_Click);
-            // 
-            // rtb1
-            // 
-            this.rtb1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.rtb1.Location = new System.Drawing.Point(588, 4);
-            this.rtb1.Margin = new System.Windows.Forms.Padding(4);
-            this.rtb1.Name = "rtb1";
-            this.rtb1.Size = new System.Drawing.Size(369, 557);
-            this.rtb1.TabIndex = 1;
-            this.rtb1.Text = "";
             // 
             // bBS
             // 
@@ -415,18 +414,18 @@
             this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(969, 594);
+            this.tabControl1.Size = new System.Drawing.Size(939, 703);
             this.tabControl1.TabIndex = 15;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.rtb1);
             this.tabPage1.Controls.Add(this.bSerialNo);
-            this.tabPage1.Controls.Add(this.button1);
+            this.tabPage1.Controls.Add(this.bCheckPolling);
             this.tabPage1.Controls.Add(this.groupBox4);
             this.tabPage1.Controls.Add(this.groupBox3);
             this.tabPage1.Controls.Add(this.groupBox1);
-            this.tabPage1.Controls.Add(this.rtb1);
             this.tabPage1.Controls.Add(this.bUbGrid);
             this.tabPage1.Controls.Add(this.bReset);
             this.tabPage1.Controls.Add(this.bRead);
@@ -436,10 +435,20 @@
             this.tabPage1.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(4);
-            this.tabPage1.Size = new System.Drawing.Size(961, 565);
+            this.tabPage1.Size = new System.Drawing.Size(931, 674);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Manual";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // rtb1
+            // 
+            this.rtb1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.rtb1.Location = new System.Drawing.Point(584, 4);
+            this.rtb1.Margin = new System.Windows.Forms.Padding(4);
+            this.rtb1.Name = "rtb1";
+            this.rtb1.Size = new System.Drawing.Size(343, 666);
+            this.rtb1.TabIndex = 20;
+            this.rtb1.Text = "";
             // 
             // bSerialNo
             // 
@@ -452,16 +461,16 @@
             this.bSerialNo.UseVisualStyleBackColor = true;
             this.bSerialNo.Click += new System.EventHandler(this.bSerialNo_Click);
             // 
-            // button1
+            // bCheckPolling
             // 
-            this.button1.Location = new System.Drawing.Point(361, 305);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 48);
-            this.button1.TabIndex = 18;
-            this.button1.Text = "Check polling";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.bCheckPolling.Location = new System.Drawing.Point(361, 305);
+            this.bCheckPolling.Margin = new System.Windows.Forms.Padding(4);
+            this.bCheckPolling.Name = "bCheckPolling";
+            this.bCheckPolling.Size = new System.Drawing.Size(101, 48);
+            this.bCheckPolling.TabIndex = 18;
+            this.bCheckPolling.Text = "Check polling";
+            this.bCheckPolling.UseVisualStyleBackColor = true;
+            this.bCheckPolling.Click += new System.EventHandler(this.button1_Click);
             // 
             // groupBox4
             // 
@@ -812,39 +821,143 @@
             this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
-            this.tabPage2.Size = new System.Drawing.Size(961, 565);
+            this.tabPage2.Size = new System.Drawing.Size(931, 674);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Instruments";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // groupBox9
             // 
+            this.groupBox9.Controls.Add(this.label34);
+            this.groupBox9.Controls.Add(this.groupBox10);
+            this.groupBox9.Controls.Add(this.label18);
+            this.groupBox9.Controls.Add(this.nPower);
             this.groupBox9.Controls.Add(this.cbVoaAddress);
             this.groupBox9.Controls.Add(this.button2);
-            this.groupBox9.Location = new System.Drawing.Point(596, 427);
+            this.groupBox9.Location = new System.Drawing.Point(11, 570);
             this.groupBox9.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox9.Name = "groupBox9";
             this.groupBox9.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox9.Size = new System.Drawing.Size(339, 129);
+            this.groupBox9.Size = new System.Drawing.Size(916, 94);
             this.groupBox9.TabIndex = 22;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "VOA";
             // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(12, 75);
+            this.label34.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(13, 17);
+            this.label34.TabIndex = 23;
+            this.label34.Tag = "idn?";
+            this.label34.Text = "-";
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.radioButton14);
+            this.groupBox10.Controls.Add(this.radioButton13);
+            this.groupBox10.Controls.Add(this.radioButton9);
+            this.groupBox10.Location = new System.Drawing.Point(381, 21);
+            this.groupBox10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.groupBox10.Size = new System.Drawing.Size(242, 58);
+            this.groupBox10.TabIndex = 22;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = "Wavelength";
+            // 
+            // radioButton14
+            // 
+            this.radioButton14.AutoSize = true;
+            this.radioButton14.Location = new System.Drawing.Point(170, 27);
+            this.radioButton14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.radioButton14.Name = "radioButton14";
+            this.radioButton14.Size = new System.Drawing.Size(61, 21);
+            this.radioButton14.TabIndex = 2;
+            this.radioButton14.Text = "1625";
+            this.radioButton14.UseVisualStyleBackColor = true;
+            // 
+            // radioButton13
+            // 
+            this.radioButton13.AutoSize = true;
+            this.radioButton13.Location = new System.Drawing.Point(98, 27);
+            this.radioButton13.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.radioButton13.Name = "radioButton13";
+            this.radioButton13.Size = new System.Drawing.Size(61, 21);
+            this.radioButton13.TabIndex = 1;
+            this.radioButton13.Text = "1550";
+            this.radioButton13.UseVisualStyleBackColor = true;
+            // 
+            // radioButton9
+            // 
+            this.radioButton9.AutoSize = true;
+            this.radioButton9.Checked = true;
+            this.radioButton9.Location = new System.Drawing.Point(14, 27);
+            this.radioButton9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.radioButton9.Name = "radioButton9";
+            this.radioButton9.Size = new System.Drawing.Size(61, 21);
+            this.radioButton9.TabIndex = 0;
+            this.radioButton9.TabStop = true;
+            this.radioButton9.Text = "1310";
+            this.radioButton9.UseVisualStyleBackColor = true;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(740, 39);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(89, 17);
+            this.label18.TabIndex = 21;
+            this.label18.Text = "Power (dBm)";
+            // 
+            // nPower
+            // 
+            this.nPower.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.nPower.Location = new System.Drawing.Point(835, 37);
+            this.nPower.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.nPower.Maximum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+            this.nPower.Minimum = new decimal(new int[] {
+            35,
+            0,
+            0,
+            -2147483648});
+            this.nPower.Name = "nPower";
+            this.nPower.Size = new System.Drawing.Size(76, 22);
+            this.nPower.TabIndex = 20;
+            this.nPower.Value = new decimal(new int[] {
+            15,
+            0,
+            0,
+            -2147483648});
+            // 
             // cbVoaAddress
             // 
+            this.cbVoaAddress.BackColor = System.Drawing.Color.Bisque;
+            this.cbVoaAddress.ForeColor = System.Drawing.Color.Red;
             this.cbVoaAddress.FormattingEnabled = true;
-            this.cbVoaAddress.Location = new System.Drawing.Point(115, 23);
+            this.cbVoaAddress.Location = new System.Drawing.Point(104, 23);
             this.cbVoaAddress.Margin = new System.Windows.Forms.Padding(4);
             this.cbVoaAddress.Name = "cbVoaAddress";
-            this.cbVoaAddress.Size = new System.Drawing.Size(92, 24);
+            this.cbVoaAddress.Size = new System.Drawing.Size(170, 24);
             this.cbVoaAddress.TabIndex = 19;
+            this.cbVoaAddress.Text = "<Select>";
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(12, 23);
+            this.button2.Location = new System.Drawing.Point(8, 23);
             this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(91, 43);
+            this.button2.Size = new System.Drawing.Size(75, 43);
             this.button2.TabIndex = 18;
             this.button2.Tag = "Pickering";
             this.button2.Text = "Connect...";
@@ -1002,10 +1115,10 @@
             // 
             // bSG2
             // 
-            this.bSG2.Location = new System.Drawing.Point(8, 23);
+            this.bSG2.Location = new System.Drawing.Point(3, 29);
             this.bSG2.Margin = new System.Windows.Forms.Padding(4);
             this.bSG2.Name = "bSG2";
-            this.bSG2.Size = new System.Drawing.Size(69, 43);
+            this.bSG2.Size = new System.Drawing.Size(75, 43);
             this.bSG2.TabIndex = 0;
             this.bSG2.Tag = "SG2";
             this.bSG2.Text = "Connect...";
@@ -1014,7 +1127,7 @@
             // 
             // gbPickering
             // 
-            this.gbPickering.Controls.Add(this.checkBox1);
+            this.gbPickering.Controls.Add(this.chbManualSwitching);
             this.gbPickering.Controls.Add(this.cbInstrumentPickering);
             this.gbPickering.Controls.Add(this.radioButton8);
             this.gbPickering.Controls.Add(this.radioButton7);
@@ -1029,26 +1142,27 @@
             this.gbPickering.Controls.Add(this.label5);
             this.gbPickering.Controls.Add(this.numCard);
             this.gbPickering.Controls.Add(this.label6);
-            this.gbPickering.Location = new System.Drawing.Point(11, 427);
+            this.gbPickering.Location = new System.Drawing.Point(11, 424);
             this.gbPickering.Margin = new System.Windows.Forms.Padding(4);
             this.gbPickering.Name = "gbPickering";
             this.gbPickering.Padding = new System.Windows.Forms.Padding(4);
-            this.gbPickering.Size = new System.Drawing.Size(564, 129);
+            this.gbPickering.Size = new System.Drawing.Size(920, 129);
             this.gbPickering.TabIndex = 18;
             this.gbPickering.TabStop = false;
             this.gbPickering.Tag = "Pickering";
             this.gbPickering.Text = "Pickering switch";
             // 
-            // checkBox1
+            // chbManualSwitching
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(131, 14);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(166, 21);
-            this.checkBox1.TabIndex = 33;
-            this.checkBox1.Text = "Use manual switching";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.chbManualSwitching.AutoSize = true;
+            this.chbManualSwitching.Location = new System.Drawing.Point(91, 21);
+            this.chbManualSwitching.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.chbManualSwitching.Name = "chbManualSwitching";
+            this.chbManualSwitching.Size = new System.Drawing.Size(166, 21);
+            this.chbManualSwitching.TabIndex = 33;
+            this.chbManualSwitching.Text = "Use manual switching";
+            this.chbManualSwitching.UseVisualStyleBackColor = true;
+            this.chbManualSwitching.CheckedChanged += new System.EventHandler(this.chbManualSwitching_CheckedChanged);
             // 
             // cbInstrumentPickering
             // 
@@ -1066,7 +1180,7 @@
             // radioButton8
             // 
             this.radioButton8.AutoSize = true;
-            this.radioButton8.Location = new System.Drawing.Point(528, 100);
+            this.radioButton8.Location = new System.Drawing.Point(712, 97);
             this.radioButton8.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton8.Name = "radioButton8";
             this.radioButton8.Size = new System.Drawing.Size(17, 16);
@@ -1078,7 +1192,7 @@
             // radioButton7
             // 
             this.radioButton7.AutoSize = true;
-            this.radioButton7.Location = new System.Drawing.Point(528, 71);
+            this.radioButton7.Location = new System.Drawing.Point(712, 72);
             this.radioButton7.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton7.Name = "radioButton7";
             this.radioButton7.Size = new System.Drawing.Size(17, 16);
@@ -1091,7 +1205,7 @@
             // 
             this.radioButton6.AutoSize = true;
             this.radioButton6.Checked = true;
-            this.radioButton6.Location = new System.Drawing.Point(528, 44);
+            this.radioButton6.Location = new System.Drawing.Point(712, 47);
             this.radioButton6.Margin = new System.Windows.Forms.Padding(4);
             this.radioButton6.Name = "radioButton6";
             this.radioButton6.Size = new System.Drawing.Size(17, 16);
@@ -1103,7 +1217,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(468, 98);
+            this.numericUpDown1.Location = new System.Drawing.Point(652, 95);
             this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             6,
@@ -1128,7 +1242,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(381, 103);
+            this.label16.Location = new System.Drawing.Point(565, 100);
             this.label16.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(74, 17);
@@ -1137,7 +1251,7 @@
             // 
             // numSwitch2
             // 
-            this.numSwitch2.Location = new System.Drawing.Point(468, 69);
+            this.numSwitch2.Location = new System.Drawing.Point(652, 69);
             this.numSwitch2.Margin = new System.Windows.Forms.Padding(4);
             this.numSwitch2.Maximum = new decimal(new int[] {
             6,
@@ -1162,7 +1276,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(381, 74);
+            this.label7.Location = new System.Drawing.Point(565, 74);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(74, 17);
@@ -1171,7 +1285,7 @@
             // 
             // numSwitch1
             // 
-            this.numSwitch1.Location = new System.Drawing.Point(468, 41);
+            this.numSwitch1.Location = new System.Drawing.Point(652, 44);
             this.numSwitch1.Margin = new System.Windows.Forms.Padding(4);
             this.numSwitch1.Maximum = new decimal(new int[] {
             6,
@@ -1196,7 +1310,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(381, 41);
+            this.label4.Location = new System.Drawing.Point(565, 44);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(74, 17);
@@ -1218,7 +1332,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(408, 14);
+            this.label5.Location = new System.Drawing.Point(592, 17);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(50, 17);
@@ -1227,7 +1341,7 @@
             // 
             // numCard
             // 
-            this.numCard.Location = new System.Drawing.Point(468, 11);
+            this.numCard.Location = new System.Drawing.Point(652, 14);
             this.numCard.Margin = new System.Windows.Forms.Padding(4);
             this.numCard.Name = "numCard";
             this.numCard.Size = new System.Drawing.Size(43, 22);
@@ -1683,7 +1797,7 @@
             this.tpSpurs.Location = new System.Drawing.Point(4, 25);
             this.tpSpurs.Margin = new System.Windows.Forms.Padding(4);
             this.tpSpurs.Name = "tpSpurs";
-            this.tpSpurs.Size = new System.Drawing.Size(961, 565);
+            this.tpSpurs.Size = new System.Drawing.Size(931, 674);
             this.tpSpurs.TabIndex = 2;
             this.tpSpurs.Text = "Spurs";
             this.tpSpurs.UseVisualStyleBackColor = true;
@@ -1715,10 +1829,10 @@
             // progressBar1
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(0, 537);
+            this.progressBar1.Location = new System.Drawing.Point(0, 646);
             this.progressBar1.Margin = new System.Windows.Forms.Padding(4);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(961, 28);
+            this.progressBar1.Size = new System.Drawing.Size(931, 28);
             this.progressBar1.TabIndex = 27;
             // 
             // bSpurTest
@@ -1980,7 +2094,7 @@
             this.tpIM3.Margin = new System.Windows.Forms.Padding(4);
             this.tpIM3.Name = "tpIM3";
             this.tpIM3.Padding = new System.Windows.Forms.Padding(4);
-            this.tpIM3.Size = new System.Drawing.Size(961, 565);
+            this.tpIM3.Size = new System.Drawing.Size(931, 674);
             this.tpIM3.TabIndex = 3;
             this.tpIM3.Text = "IM3";
             this.tpIM3.UseVisualStyleBackColor = true;
@@ -2038,7 +2152,7 @@
             this.tpMER.Margin = new System.Windows.Forms.Padding(4);
             this.tpMER.Name = "tpMER";
             this.tpMER.Padding = new System.Windows.Forms.Padding(4);
-            this.tpMER.Size = new System.Drawing.Size(961, 565);
+            this.tpMER.Size = new System.Drawing.Size(931, 674);
             this.tpMER.TabIndex = 4;
             this.tpMER.Text = "MER";
             this.tpMER.UseVisualStyleBackColor = true;
@@ -2075,7 +2189,7 @@
             0,
             0});
             this.numAverages.Name = "numAverages";
-            this.numAverages.Size = new System.Drawing.Size(95, 22);
+            this.numAverages.Size = new System.Drawing.Size(53, 22);
             this.numAverages.TabIndex = 16;
             this.numAverages.Value = new decimal(new int[] {
             50,
@@ -2097,12 +2211,12 @@
             // 
             this.dgvMERs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvMERs.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dgvMERs.Location = new System.Drawing.Point(637, 4);
+            this.dgvMERs.Location = new System.Drawing.Point(607, 4);
             this.dgvMERs.Margin = new System.Windows.Forms.Padding(4);
             this.dgvMERs.Name = "dgvMERs";
             this.dgvMERs.RowHeadersVisible = false;
             this.dgvMERs.RowHeadersWidth = 51;
-            this.dgvMERs.Size = new System.Drawing.Size(320, 557);
+            this.dgvMERs.Size = new System.Drawing.Size(320, 666);
             this.dgvMERs.TabIndex = 15;
             // 
             // groupBox6
@@ -2353,7 +2467,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(969, 594);
+            this.ClientSize = new System.Drawing.Size(939, 703);
             this.Controls.Add(this.tabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
@@ -2381,6 +2495,10 @@
             this.gbBand.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nPower)).EndInit();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFixtureLoss2)).EndInit();
@@ -2438,7 +2556,6 @@
         #endregion
 
         private System.Windows.Forms.Button bUnlock;
-        private System.Windows.Forms.RichTextBox rtb1;
         private System.Windows.Forms.Button bBS;
         private System.Windows.Forms.Button bCS;
         private System.Windows.Forms.Button bAllocate;
@@ -2527,7 +2644,7 @@
         private System.Windows.Forms.Button bSpurTestDbs;
         private System.Windows.Forms.Button bDcsSpurTest;
         private System.Windows.Forms.TabPage tpIM3;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bCheckPolling;
         private System.Windows.Forms.NumericUpDown numSGPower2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.RadioButton radioButton5;
@@ -2592,7 +2709,15 @@
         private System.Windows.Forms.ComboBox cbInstrumentSG1;
         private System.Windows.Forms.ComboBox cbInstrumentPickering;
         private System.Windows.Forms.Button bSerialNo;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox chbManualSwitching;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.GroupBox groupBox10;
+        private System.Windows.Forms.RadioButton radioButton13;
+        private System.Windows.Forms.RadioButton radioButton9;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.NumericUpDown nPower;
+        private System.Windows.Forms.RichTextBox rtb1;
+        private System.Windows.Forms.RadioButton radioButton14;
     }
 }
 
