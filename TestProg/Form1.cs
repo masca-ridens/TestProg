@@ -78,18 +78,18 @@ namespace TestProg
 
             try
             {
-            string[] resources = ioMgr.FindRsrc("?*");
-            cbInstrumentSA1.Items.Clear();
-            cbInstrumentSG1.Items.Clear();
-            cbInstrumentSG2.Items.Clear();
-            cbInstrumentPickering.Items.Clear();
+                string[] resources = ioMgr.FindRsrc("?*");
+                cbInstrumentSA1.Items.Clear();
+                cbInstrumentSG1.Items.Clear();
+                cbInstrumentSG2.Items.Clear();
+                cbInstrumentPickering.Items.Clear();
 
-            cbInstrumentSA1.Items.AddRange(resources);
-            cbInstrumentSG1.Items.AddRange(resources);
-            cbInstrumentSG2.Items.AddRange(resources);
-            cbInstrumentPickering.Items.AddRange(resources);
+                cbInstrumentSA1.Items.AddRange(resources);
+                cbInstrumentSG1.Items.AddRange(resources);
+                cbInstrumentSG2.Items.AddRange(resources);
+                cbInstrumentPickering.Items.AddRange(resources);
             }
-                catch
+            catch
             {
                 rtb1.AppendText("No instruments connected" + Environment.NewLine);
             }
@@ -2572,6 +2572,50 @@ namespace TestProg
             // Autorange the spectrum analyser...this performs the sweep
             instruments[instrument].WriteString(":ANAL:RANGE:AUTO");
             CheckStatus(instrument, out bool measurementDone, out bool autoRanging, out bool calibrating, out bool notPaused);
+        }
+
+        private void bSwVersion(object sender, EventArgs e)
+        {
+            int[] sw_version = FSK.SoftwareVersion(usb, 'F', 1);
+            string s = string.Empty;
+            try
+            {
+                s = string.Join(".", sw_version);
+            }
+            catch
+            {
+                s = "Failed to read SW version";
+            }
+            finally
+            {
+                rtb1.AppendText(s + Environment.NewLine);
+            }
+        }
+
+        private void bProductId_Click(object sender, EventArgs e)
+        {
+            string productId = FSK.GetProductId(usb, 'F', 1);
+            rtb1.AppendText(productId + Environment.NewLine);
+        }
+
+        private void radioButton15_CheckedChanged(object sender, EventArgs e)
+        {
+            bool enable = radioButton15.Checked ? true : false;
+
+            foreach (CheckBox cb in groupBox2.Controls)
+            {
+                if (cb.Checked)
+                {
+                    int rx = int.Parse(cb.Tag.ToString());
+                    bool success = FSK.EnableTones(usb, 'F', rx, enable);
+                    if (!success)
+                    {
+                        rtb1.AppendText("Failed to toggle tones on Rx" + rx.ToString() + Environment.NewLine);
+                    }
+                    else
+                        rtb1.AppendText("Rx" + rx.ToString() + " tones are " + (enable ? "on" : "off") + Environment.NewLine);
+                }
+            }
         }
     }
 }

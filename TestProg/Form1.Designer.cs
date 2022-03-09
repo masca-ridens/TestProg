@@ -44,6 +44,8 @@
             this.bUbGrid = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.rtb1 = new System.Windows.Forms.RichTextBox();
             this.bSerialNo = new System.Windows.Forms.Button();
             this.bCheckPolling = new System.Windows.Forms.Button();
@@ -191,10 +193,16 @@
             this.numSymbolRate = new System.Windows.Forms.NumericUpDown();
             this.rtbWhiteboard = new System.Windows.Forms.RichTextBox();
             this.bMERTbs = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.groupBox11 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.bProductId = new System.Windows.Forms.Button();
+            this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.radioButton15 = new System.Windows.Forms.RadioButton();
+            this.radioButton16 = new System.Windows.Forms.RadioButton();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.groupBox11.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.gbLNB.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -247,7 +255,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numFirstUpper)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpperStep)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numSymbolRate)).BeginInit();
-            this.groupBox11.SuspendLayout();
+            this.groupBox12.SuspendLayout();
             this.SuspendLayout();
             // 
             // bUnlock
@@ -342,9 +350,9 @@
             // 
             // bDCOn
             // 
-            this.bDCOn.Location = new System.Drawing.Point(83, 19);
+            this.bDCOn.Location = new System.Drawing.Point(133, 19);
             this.bDCOn.Name = "bDCOn";
-            this.bDCOn.Size = new System.Drawing.Size(62, 41);
+            this.bDCOn.Size = new System.Drawing.Size(49, 41);
             this.bDCOn.TabIndex = 10;
             this.bDCOn.Text = "DC ON";
             this.bDCOn.UseVisualStyleBackColor = true;
@@ -363,9 +371,9 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(83, 66);
+            this.button5.Location = new System.Drawing.Point(133, 88);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(62, 41);
+            this.button5.Size = new System.Drawing.Size(49, 41);
             this.button5.TabIndex = 12;
             this.button5.Text = "DC OFF";
             this.button5.UseVisualStyleBackColor = true;
@@ -408,6 +416,9 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.groupBox12);
+            this.tabPage1.Controls.Add(this.bProductId);
+            this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.groupBox11);
             this.tabPage1.Controls.Add(this.rtb1);
             this.tabPage1.Controls.Add(this.bSerialNo);
@@ -428,6 +439,29 @@
             this.tabPage1.Text = "Manual";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // groupBox11
+            // 
+            this.groupBox11.Controls.Add(this.comboBox1);
+            this.groupBox11.Location = new System.Drawing.Point(9, 463);
+            this.groupBox11.Name = "groupBox11";
+            this.groupBox11.Size = new System.Drawing.Size(143, 76);
+            this.groupBox11.TabIndex = 22;
+            this.groupBox11.TabStop = false;
+            this.groupBox11.Text = "Product";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "DPH34",
+            "OTx",
+            "DON2 Destacker",
+            "DON2 Stacker"});
+            this.comboBox1.Location = new System.Drawing.Point(6, 19);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
+            this.comboBox1.TabIndex = 21;
+            // 
             // rtb1
             // 
             this.rtb1.Dock = System.Windows.Forms.DockStyle.Right;
@@ -441,7 +475,7 @@
             // 
             this.bSerialNo.Location = new System.Drawing.Point(353, 150);
             this.bSerialNo.Name = "bSerialNo";
-            this.bSerialNo.Size = new System.Drawing.Size(62, 41);
+            this.bSerialNo.Size = new System.Drawing.Size(70, 41);
             this.bSerialNo.TabIndex = 19;
             this.bSerialNo.Text = "Read serial #";
             this.bSerialNo.UseVisualStyleBackColor = true;
@@ -451,7 +485,7 @@
             // 
             this.bCheckPolling.Location = new System.Drawing.Point(271, 248);
             this.bCheckPolling.Name = "bCheckPolling";
-            this.bCheckPolling.Size = new System.Drawing.Size(76, 39);
+            this.bCheckPolling.Size = new System.Drawing.Size(76, 41);
             this.bCheckPolling.TabIndex = 18;
             this.bCheckPolling.Text = "Check polling";
             this.bCheckPolling.UseVisualStyleBackColor = true;
@@ -459,12 +493,13 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.groupBox2);
             this.groupBox4.Controls.Add(this.gbLNB);
             this.groupBox4.Controls.Add(this.bDCOn);
             this.groupBox4.Controls.Add(this.button5);
             this.groupBox4.Location = new System.Drawing.Point(9, 140);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(166, 147);
+            this.groupBox4.Size = new System.Drawing.Size(188, 147);
             this.groupBox4.TabIndex = 17;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Settings";
@@ -632,7 +667,6 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.gbTo);
             this.groupBox1.Controls.Add(this.gbBand);
             this.groupBox1.Controls.Add(this.bBS);
@@ -646,11 +680,13 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.checkBox2);
+            this.groupBox2.Controls.Add(this.checkBox1);
             this.groupBox2.Controls.Add(this.chRx1);
             this.groupBox2.Controls.Add(this.chRx2);
-            this.groupBox2.Location = new System.Drawing.Point(96, 19);
+            this.groupBox2.Location = new System.Drawing.Point(64, 19);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(50, 100);
+            this.groupBox2.Size = new System.Drawing.Size(50, 110);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Port";
@@ -660,7 +696,7 @@
             this.chRx1.AutoSize = true;
             this.chRx1.Checked = true;
             this.chRx1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chRx1.Location = new System.Drawing.Point(6, 33);
+            this.chRx1.Location = new System.Drawing.Point(3, 17);
             this.chRx1.Name = "chRx1";
             this.chRx1.Size = new System.Drawing.Size(45, 17);
             this.chRx1.TabIndex = 12;
@@ -673,12 +709,12 @@
             this.chRx2.AutoSize = true;
             this.chRx2.Checked = true;
             this.chRx2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chRx2.Location = new System.Drawing.Point(6, 56);
+            this.chRx2.Location = new System.Drawing.Point(3, 63);
             this.chRx2.Name = "chRx2";
             this.chRx2.Size = new System.Drawing.Size(45, 17);
             this.chRx2.TabIndex = 13;
-            this.chRx2.Tag = "2";
-            this.chRx2.Text = "Rx2";
+            this.chRx2.Tag = "3";
+            this.chRx2.Text = "Rx3";
             this.chRx2.UseVisualStyleBackColor = true;
             // 
             // gbTo
@@ -2294,28 +2330,85 @@
             this.bMERTbs.UseVisualStyleBackColor = true;
             this.bMERTbs.Click += new System.EventHandler(this.bMERTbs_Click);
             // 
-            // comboBox1
+            // button1
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "DPH34",
-            "OTx",
-            "DON2 Destacker",
-            "DON2 Stacker"});
-            this.comboBox1.Location = new System.Drawing.Point(6, 19);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 21;
+            this.button1.Location = new System.Drawing.Point(353, 201);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(70, 41);
+            this.button1.TabIndex = 23;
+            this.button1.Text = "Read s/w version";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.bSwVersion);
             // 
-            // groupBox11
+            // bProductId
             // 
-            this.groupBox11.Controls.Add(this.comboBox1);
-            this.groupBox11.Location = new System.Drawing.Point(9, 463);
-            this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(225, 76);
-            this.groupBox11.TabIndex = 22;
-            this.groupBox11.TabStop = false;
-            this.groupBox11.Text = "Product";
+            this.bProductId.Location = new System.Drawing.Point(353, 248);
+            this.bProductId.Name = "bProductId";
+            this.bProductId.Size = new System.Drawing.Size(70, 41);
+            this.bProductId.TabIndex = 24;
+            this.bProductId.Text = "Get product Id";
+            this.bProductId.UseVisualStyleBackColor = true;
+            this.bProductId.Click += new System.EventHandler(this.bProductId_Click);
+            // 
+            // groupBox12
+            // 
+            this.groupBox12.Controls.Add(this.radioButton16);
+            this.groupBox12.Controls.Add(this.radioButton15);
+            this.groupBox12.Location = new System.Drawing.Point(172, 463);
+            this.groupBox12.Name = "groupBox12";
+            this.groupBox12.Size = new System.Drawing.Size(146, 76);
+            this.groupBox12.TabIndex = 25;
+            this.groupBox12.TabStop = false;
+            this.groupBox12.Text = "Tones";
+            // 
+            // radioButton15
+            // 
+            this.radioButton15.AutoSize = true;
+            this.radioButton15.Location = new System.Drawing.Point(5, 19);
+            this.radioButton15.Name = "radioButton15";
+            this.radioButton15.Size = new System.Drawing.Size(39, 17);
+            this.radioButton15.TabIndex = 0;
+            this.radioButton15.Text = "On";
+            this.radioButton15.UseVisualStyleBackColor = true;
+            this.radioButton15.CheckedChanged += new System.EventHandler(this.radioButton15_CheckedChanged);
+            // 
+            // radioButton16
+            // 
+            this.radioButton16.AutoSize = true;
+            this.radioButton16.Checked = true;
+            this.radioButton16.Location = new System.Drawing.Point(54, 20);
+            this.radioButton16.Name = "radioButton16";
+            this.radioButton16.Size = new System.Drawing.Size(39, 17);
+            this.radioButton16.TabIndex = 1;
+            this.radioButton16.TabStop = true;
+            this.radioButton16.Text = "Off";
+            this.radioButton16.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(3, 40);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(45, 17);
+            this.checkBox1.TabIndex = 14;
+            this.checkBox1.Tag = "2";
+            this.checkBox1.Text = "Rx2";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Checked = true;
+            this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox2.Location = new System.Drawing.Point(3, 85);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(45, 17);
+            this.checkBox2.TabIndex = 15;
+            this.checkBox2.Tag = "4";
+            this.checkBox2.Text = "Rx4";
+            this.checkBox2.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -2330,6 +2423,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.groupBox11.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.gbLNB.ResumeLayout(false);
             this.gbLNB.PerformLayout();
@@ -2402,7 +2496,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numFirstUpper)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpperStep)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numSymbolRate)).EndInit();
-            this.groupBox11.ResumeLayout(false);
+            this.groupBox12.ResumeLayout(false);
+            this.groupBox12.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -2574,6 +2669,13 @@
         private System.Windows.Forms.RadioButton radioButton14;
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bProductId;
+        private System.Windows.Forms.GroupBox groupBox12;
+        private System.Windows.Forms.RadioButton radioButton16;
+        private System.Windows.Forms.RadioButton radioButton15;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
