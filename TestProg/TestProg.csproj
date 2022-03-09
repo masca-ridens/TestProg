@@ -56,9 +56,9 @@
     <Reference Include="Agilent.SA.Vsa.Interfaces">
       <HintPath>..\Agilent.SA.Vsa.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="Broadcom_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Broadcom_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Class Libraries\Broadcom_lib\Broadcom_lib\bin\x64\Release\Broadcom_lib.dll</HintPath>
+      <HintPath>..\..\Class Libraries\Broadcom_lib\Broadcom_lib\bin\x64\Debug\Broadcom_lib.dll</HintPath>
     </Reference>
     <Reference Include="Ivi.Driver.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -75,9 +75,6 @@
     </Reference>
     <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
-    </Reference>
-    <Reference Include="Multigen_lib">
-      <HintPath>..\..\Class Libraries\Multigen_lib\Multigen_lib\bin\x64\Release\Multigen_lib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -98,7 +95,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="VSA89601_lib">
-      <HintPath>..\..\VSA89601_lib\VSA89601_lib\bin\x64\Debug\netstandard2.0\VSA89601_lib.dll</HintPath>
+      <HintPath>..\..\masca-ridens\VSA89601_lib\VSA89601_lib\bin\x64\Release\netstandard2.0\VSA89601_lib.dll</HintPath>
     </Reference>
     <Reference Include="Windows_lib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

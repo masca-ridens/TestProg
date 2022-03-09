@@ -76,6 +76,8 @@ namespace TestProg
                 usb.Open();
             }
 
+            try
+            {
             string[] resources = ioMgr.FindRsrc("?*");
             cbInstrumentSA1.Items.Clear();
             cbInstrumentSG1.Items.Clear();
@@ -86,10 +88,16 @@ namespace TestProg
             cbInstrumentSG1.Items.AddRange(resources);
             cbInstrumentSG2.Items.AddRange(resources);
             cbInstrumentPickering.Items.AddRange(resources);
+            }
+                catch
+            {
+                rtb1.AppendText("No instruments connected" + Environment.NewLine);
+            }
 
-            tabControl1.SelectedTab = tabPage2;
+            tabControl1.SelectedTab = tabPage1;
 
             chbManualSwitching.Checked = false;
+            comboBox1.SelectedIndex = comboBox1.FindStringExact("DPH34");
         }
 
         private void BDCOn_Click(object sender, EventArgs e)
@@ -104,7 +112,8 @@ namespace TestProg
 
         private void BUnlock_Click(object sender, EventArgs e)
         {
-            bool success = FSK.Unlock(usb, 'F', 1);
+            string product = comboBox1.GetItemText(comboBox1.SelectedItem);
+            bool success = FSK.Unlock(usb, 'F', 1, product);
             if (success)
                 rtb1.AppendText("Unlocked" + Environment.NewLine);
             else rtb1.AppendText("Unlock failed" + Environment.NewLine);
@@ -1044,8 +1053,6 @@ namespace TestProg
             foreach (CheckBox b in checkedBoxes)
             {
                 rx = Int32.Parse(b.Tag.ToString());
-                //if (FSK.TdmaPollingIsOn(usb, 'F', rx)) rtb1.AppendText("TDMA polling is Enabled on port " + rx.ToString() + Environment.NewLine);
-                //else rtb1.AppendText("TDMA polling is Disabled on port " + rx.ToString() + Environment.NewLine);
             }
         }
         private void RouteSignal(int rx, bool on)
@@ -1660,102 +1667,460 @@ namespace TestProg
             return;
         }
 
-        private int Setup89601VSA()
+        //private int Setup89601VSA()
+        //{
+        //    Binstrument_Click(bSA, new EventArgs());
+        //    int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
+
+        //    // -----------------------------  Confirm the VSA process is running  ---------------------------------------------
+
+        //    instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
+        //    string s = instruments[SpecAn1].ReadString();
+        //    rtbWhiteboard.AppendText("VSA returns " + s);
+
+        //    //instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
+        //    //instruments[SpecAn1].WriteString("INSTrument: SELect?");
+        //    //string q = instruments[SpecAn1].ReadString();
+
+        //    // --------------------  Set up the displays etc.  -----------------------------------------------------------
+
+        //    instruments[SpecAn1].WriteString(":DISPlay:ENABle 1");
+        //    instruments[SpecAn1].WriteString(":DISPlay:ENABle?");
+        //    string q = instruments[SpecAn1].ReadString() == "1" ? "Display is on" : "Display is off";
+        //    rtbWhiteboard.AppendText(q + Environment.NewLine);
+
+        //    // Turn auto-cal off so that it doesn't run when it is not expected 
+        //    // (which could result in timeouts when using SCPI without long enough timeout values).
+
+        //    instruments[SpecAn1].WriteString(":CAL:AUTO 0");
+        //    instruments[SpecAn1].WriteString(":CAL:AUTO?");
+        //    q = instruments[SpecAn1].ReadString() == "1" ? "Auto-cal is on" : "Auto-cal is off";
+        //    rtbWhiteboard.AppendText(q + Environment.NewLine);
+
+        //    // ---------------------     Setup the Digital Demod Measurement   ------------------------------------
+
+        //    instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod");
+        //    instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod:NDEFault");
+        //    instruments[SpecAn1].WriteString(":INITiate:DDEMod");
+
+        //    instruments[SpecAn1].WriteString("INPut:DATA HW");   // Hardware rather than simulated input
+        //    instruments[SpecAn1].WriteString(":INPut:DATA?");
+        //    rtbWhiteboard.AppendText("Data is coming from " + instruments[SpecAn1].ReadString());
+
+        //    instruments[SpecAn1].WriteString("DDEM:MOD PSK8");
+        //    instruments[SpecAn1].WriteString("DDEM:MOD?");
+        //    rtbWhiteboard.AppendText("Modulation is " + instruments[SpecAn1].ReadString());
+
+        //    instruments[SpecAn1].WriteString(":DDEM:FILT:REF RECT");
+        //    instruments[SpecAn1].WriteString(":DDEM:FILT?");
+        //    rtbWhiteboard.AppendText("The filter is " + instruments[SpecAn1].ReadString());
+
+        //    instruments[SpecAn1].WriteString(":DDEM:SRAT" + numSymbolRate.Value.ToString() + "MHZ");
+        //    instruments[SpecAn1].WriteString(":DDEM:SRAT?");
+        //    string reply = instruments[SpecAn1].ReadString().TrimEnd('\n').Replace("+", "");
+        //    if (decimal.TryParse(reply, out decimal symbolRate))
+        //    {
+        //        symbolRate /= 1E6m;
+        //        rtbWhiteboard.AppendText("The symbol rate is " + symbolRate + " MS/s" + Environment.NewLine);
+        //    }
+        //    else rtbWhiteboard.AppendText("The symbol rate is not readable" + Environment.NewLine);
+
+        //    instruments[SpecAn1].WriteString(":FREQ:CENT?");
+        //    decimal centre = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
+        //    rtbWhiteboard.AppendText("The centre frequency is " + centre.ToString() + " MHz" + Environment.NewLine);
+        //    instruments[SpecAn1].WriteString(":FREQuency:SPAN 60 MHz");
+        //    instruments[SpecAn1].WriteString(":FREQ:SPAN?");
+        //    decimal span = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
+        //    rtbWhiteboard.AppendText("The frequency span is " + span.ToString() + " MHz" + Environment.NewLine);
+        //    rtbWhiteboard.Refresh();
+        //    rtbWhiteboard.Update();
+
+        //    // ---------------------------   Seek the MER Trace  -----------------------------------------------------
+
+        //    instruments[SpecAn1].WriteString("TRACe:COUNt?");
+        //    int traceCount = int.Parse(instruments[SpecAn1].ReadString());
+        //    int selectedTraceNo = 0;   // NB not a valid trace
+        //    for (int t = 1; t <= traceCount; t++)
+        //    {
+        //        try
+        //        {
+        //            instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
+        //            string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
+
+        //            if (tName.Contains("Syms/Errs"))
+        //            {
+        //                selectedTraceNo = t;
+        //                rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
+        //                break;
+        //            }
+        //        }
+        //        catch
+        //        {
+        //            continue;
+        //        }
+
+        //    }
+        //    return selectedTraceNo;
+        //}
+        private void MeasureMer(object sender, EventArgs e)
         {
-            Binstrument_Click(bSA, new EventArgs());
-            int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
+            // Which mode are we testing?
+            string mode = (sender as Button).Tag.ToString();
 
-            // -----------------------------  Confirm the VSA process is running  ---------------------------------------------
-
-            instruments[SpecAn1].WriteString(":SYSTem:VSA:STARt;*OPC?");
-            string s = instruments[SpecAn1].ReadString();
-            rtbWhiteboard.AppendText("VSA returns " + s);
-
-            //instruments[SpecAn1].WriteString("INSTrument: SELect VSA89601");
-            //instruments[SpecAn1].WriteString("INSTrument: SELect?");
-            //string q = instruments[SpecAn1].ReadString();
-
-            // --------------------  Set up the displays etc.  -----------------------------------------------------------
-
-            instruments[SpecAn1].WriteString(":DISPlay:ENABle 1");
-            instruments[SpecAn1].WriteString(":DISPlay:ENABle?");
-            string q = instruments[SpecAn1].ReadString() == "1" ? "Display is on" : "Display is off";
-            rtbWhiteboard.AppendText(q + Environment.NewLine);
-
-            // Turn auto-cal off so that it doesn't run when it is not expected 
-            // (which could result in timeouts when using SCPI without long enough timeout values).
-
-            instruments[SpecAn1].WriteString(":CAL:AUTO 0");
-            instruments[SpecAn1].WriteString(":CAL:AUTO?");
-            q = instruments[SpecAn1].ReadString() == "1" ? "Auto-cal is on" : "Auto-cal is off";
-            rtbWhiteboard.AppendText(q + Environment.NewLine);
-
-            // ---------------------     Setup the Digital Demod Measurement   ------------------------------------
-
-            instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod");
-            instruments[SpecAn1].WriteString(":MEASure:CONFigure:DDEMod:NDEFault");
-            instruments[SpecAn1].WriteString(":INITiate:DDEMod");
-
-            instruments[SpecAn1].WriteString("INPut:DATA HW");   // Hardware rather than simulated input
-            instruments[SpecAn1].WriteString(":INPut:DATA?");
-            rtbWhiteboard.AppendText("Data is coming from " + instruments[SpecAn1].ReadString());
-
-            instruments[SpecAn1].WriteString("DDEM:MOD PSK8");
-            instruments[SpecAn1].WriteString("DDEM:MOD?");
-            rtbWhiteboard.AppendText("Modulation is " + instruments[SpecAn1].ReadString());
-
-            instruments[SpecAn1].WriteString(":DDEM:FILT:REF RECT");
-            instruments[SpecAn1].WriteString(":DDEM:FILT?");
-            rtbWhiteboard.AppendText("The filter is " + instruments[SpecAn1].ReadString());
-
-            instruments[SpecAn1].WriteString(":DDEM:SRAT" + numSymbolRate.Value.ToString() + "MHZ");
-            instruments[SpecAn1].WriteString(":DDEM:SRAT?");
-            string reply = instruments[SpecAn1].ReadString().TrimEnd('\n').Replace("+", "");
-            if (decimal.TryParse(reply, out decimal symbolRate))
+            // Establish the temperature
+            char temperature = '?';
+            Form2 f = new Form2();
+            var result = f.ShowDialog();
+            if (result == DialogResult.OK)
             {
-                symbolRate /= 1E6m;
-                rtbWhiteboard.AppendText("The symbol rate is " + symbolRate + " MS/s" + Environment.NewLine);
+                temperature = f.t.ToUpper()[0];
             }
-            else rtbWhiteboard.AppendText("The symbol rate is not readable" + Environment.NewLine);
 
-            instruments[SpecAn1].WriteString(":FREQ:CENT?");
-            decimal centre = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
-            rtbWhiteboard.AppendText("The centre frequency is " + centre.ToString() + " MHz" + Environment.NewLine);
-            instruments[SpecAn1].WriteString(":FREQuency:SPAN 60 MHz");
-            instruments[SpecAn1].WriteString(":FREQ:SPAN?");
-            decimal span = decimal.Parse(instruments[SpecAn1].ReadString()) / 1E6m;
-            rtbWhiteboard.AppendText("The frequency span is " + span.ToString() + " MHz" + Environment.NewLine);
-            rtbWhiteboard.Refresh();
-            rtbWhiteboard.Update();
-
-            // ---------------------------   Seek the MER Trace  -----------------------------------------------------
-
-            instruments[SpecAn1].WriteString("TRACe:COUNt?");
-            int traceCount = int.Parse(instruments[SpecAn1].ReadString());
-            int selectedTraceNo = 0;   // NB not a valid trace
-            for (int t = 1; t <= traceCount; t++)
+            // Sort out the results file...
+            if (File.Exists(resultsFile))
             {
-                try
-                {
-                    instruments[SpecAn1].WriteString("TRACe" + t.ToString() + ":DATA:NAME?");
-                    string tName = instruments[SpecAn1].ReadString().Replace("\n", string.Empty);
+                DialogResult dialogResult = MessageBox.Show("Delete existing results file " + resultsFile + " ?", "?", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes) File.Delete(resultsFile);
+            }
 
-                    if (tName.Contains("Syms/Errs"))
+            // Which rx are we measuring?
+            List<int> ports = new List<int>();
+            if (chRx1.Checked == true) ports.Add(1);
+            if (chRx2.Checked == true) ports.Add(2);
+            if (ports.Count < 1) MessageBox.Show("No Rx ports selected");
+            if (mode == "DBS") ports = new List<int> { 1, 2, 3 };
+
+            // Which LNBs are we testing?
+            List<string> LNBs = new List<string>();
+            var checkedBoxes = gbInclude.Controls.OfType<CheckBox>().Where(r => r.Checked);
+            foreach (CheckBox ch in checkedBoxes)
+            {
+                LNBs.Add(ch.Tag.ToString());
+            }
+            LNBs.Sort();
+
+            // Which bands are we measuring?
+            List<string> bands = new List<string>();
+            checkedBoxes = gbTo.Controls.OfType<CheckBox>().Where(r => r.Checked);
+            foreach (CheckBox ch in checkedBoxes)
+            {
+                bands.Add(ch.Text);
+            }
+
+            if (mode != "DBS")
+            {
+                // Unlock in order to access serial number later...
+                bool success = FSK.Unlock(usb, 'F', ports[0]);
+                if (!success) MessageBox.Show("Failed to unlock at port " + ports[0].ToString());
+
+            }
+            // Get the serial number...
+            string serialNumber = FSK.ReadSerialNumbers(usb, 'F', ports[0])[1];
+            if (string.IsNullOrEmpty(serialNumber)) MessageBox.Show("Failed to get serial number");
+
+            File.AppendAllText(resultsFile, DateTime.Now.ToString() + Environment.NewLine);
+            File.AppendAllText(resultsFile, serialNumber + Environment.NewLine);
+            File.AppendAllText(resultsFile, "Test is: MER" + Environment.NewLine);
+            File.AppendAllText(resultsFile, (chIntervene.Checked ? "Intervention" : "No intervention") + Environment.NewLine);
+            File.AppendAllText(resultsFile, mode + " mode" + Environment.NewLine);
+            File.AppendAllText(resultsFile, "Temperature is " + temperature + Environment.NewLine + Environment.NewLine);
+
+            string opticalPower = nPower.Value.ToString();
+
+            // ----------------------- Write the header for the results file -------------------------------//
+
+            File.AppendAllText(resultsFile,
+                "PON_loss".PadRight(10)
+                + "LNB".PadRight(4)
+                + "Pol.".PadRight(6)
+                + "Rx".PadRight(4)
+                + "Band".PadRight(7)
+                + "Input_MHz".PadRight(12)
+                + "Output_MHz".PadRight(12)
+                + "MER_dB" + Environment.NewLine);
+
+            // ------------------- Set each Rx to BANDSTACKED or CHANNELSTACKED -----------------------------//
+
+            // For the dcs grid...
+            int noUserBands = 16;
+            List<decimal> dcsGrid = new List<decimal>();
+
+            switch (mode)
+            {
+                case "TBS":
                     {
-                        selectedTraceNo = t;
-                        rtbWhiteboard.AppendText("Suitable MER 'Trace' found: TRACE" + selectedTraceNo.ToString() + Environment.NewLine);
+                        foreach (int r in ports)
+                        {
+                            bool success = FSK.SetStackingMode(usb, r, "BandStacked");
+                            if (!success) MessageBox.Show("Failed to set BS mode for Rx " + r.ToString());
+                        }
                         break;
                     }
-                }
-                catch
-                {
-                    continue;
-                }
+                case "DCS":
+                    {
+                        // Set each Rx to CHANNEL-STACKED and disable TDMA polling...
+                        foreach (int r in ports)
+                        {
+                            bool success = FSK.SetStackingMode(usb, r, "ChannelStacked");
+                            if (!success) MessageBox.Show("Failed to set C/S mode for Rx " + r.ToString());
 
+                            success = FSK.DisableTdmaPolling(usb, 'F', r, true);
+                            if (!success) MessageBox.Show("Failed to disable TDMA polling for Rx " + r.ToString());
+
+                            success = FSK.DisableTdmaPolling(usb, 'F', r, true);
+                            if (!success) MessageBox.Show("Failed to disable TDMA polling for Rx " + r.ToString());
+                            else MessageBox.Show("Successfully disabled TDMA polling for Rx " + r.ToString());
+                        }
+
+                        List<int> grid = FSK.RequestUserBlockGrid(usb, 'F', ports[0]).ToList<int>();
+                        for (int i = 0; i < noUserBands; i++)
+                        {
+                            dcsGrid.Add(grid[0] + i * grid[1]);
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        // It is DBS so do nothing
+                        break;
+                    }
             }
-            return selectedTraceNo;
-        }
 
+            // ------------------ Prepare the spectrum analyser --------------------------------------------------------
+
+            int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
+            if (SpecAn1 == -1)
+            {
+                MessageBox.Show("Failed to connect with the Spectrum Analyser");
+                return;
+            }
+
+            // --------------------- create an instance of a VSA -------------------------------------------------------
+
+            VSA89601 vsa = new VSA89601(cbInstrumentSA1.SelectedItem.ToString());
+
+            rtbWhiteboard.AppendText("VSA process returns " + vsa.QueryVsaRunning() + Environment.NewLine);
+            vsa.DisplayOn = true;
+            vsa.AutoCal = false;
+            vsa.ActiveMeasurement = "DDEMod";
+            vsa.InputMode = "HW";
+            vsa.Modulation = "8PSK";
+            vsa.Baud = "21.5";
+            vsa.Centre = 1000;
+            vsa.Span = 60;
+            int selectedTraceNo = vsa.SeekTrace("Syms/Errs");
+
+            if (selectedTraceNo == 0)
+            {
+                rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
+                return;
+            }
+            else rtbWhiteboard.AppendText("Using trace " + selectedTraceNo.ToString() + Environment.NewLine);
+
+            string traceName = "TRACE" + selectedTraceNo;
+
+            // -------------------------  Setup the transponder frequencies  ------------------------------
+
+            List<decimal> lowerTransponders = new List<decimal>();
+            List<decimal> upperTransponders = new List<decimal>();
+            for (decimal tp = numFirstLower.Value; tp < 1450; tp += numLowerStep.Value)
+            {
+                lowerTransponders.Add(tp);
+            }
+
+            for (decimal tp = numFirstUpper.Value; tp < 2150; tp += numUpperStep.Value)
+            {
+                upperTransponders.Add(tp);
+            }
+
+            // ---------------- Sort out the ProgressBar --------------------------------------------------
+
+            progressBar1.Value = 0;
+
+            switch (mode)
+            {
+                case "DCS":
+                    {
+                        progressBar1.Maximum = LNBs.Count * ports.Count * (lowerTransponders.Count + upperTransponders.Count) * noUserBands;
+                        break;
+                    }
+                case "TBS":
+                    {
+                        progressBar1.Maximum = LNBs.Count * ports.Count * bands.Count;
+                        progressBar1.Maximum *= (lowerTransponders.Count + upperTransponders.Count);
+                        break;
+                    }
+                case "DBS":
+                    {
+                        progressBar1.Maximum *= lowerTransponders.Count + upperTransponders.Count;
+                        break;
+                    }
+            }
+
+            // Create a datatable for the results and bind it to the dgv
+
+            System.Data.DataTable mers = new System.Data.DataTable();
+            mers.Columns.Add("Frequency", typeof(decimal));
+            mers.Columns.Add("MER(dB)", typeof(double));
+            dgvMERs.DataSource = mers;
+            dgvMERs.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dgvMERs.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            decimal specAnCentreFreq = 0;
+
+            // ---------------------------------------------------------------------------------------------------------------------//
+            //                                        The Main Measurement loop                                                     //
+            //----------------------------------------------------------------------------------------------------------------------//
+
+            foreach (int r in ports)
+            {
+                // Route the proper port to the spectrum analyser...
+                if (automaticSwitching)
+                {
+                    try
+                    {
+                        var rb = gbPickering.Controls.OfType<RadioButton>().FirstOrDefault(k => k.Tag.ToString() == r.ToString());
+                        (rb as RadioButton).Checked = true;
+                        Pickering_CheckedChanged((rb as RadioButton), new EventArgs());
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Connect Rx " + r.ToString());
+                    }
+                }
+                else MessageBox.Show("Connect Rx " + r.ToString());
+
+                rtbWhiteboard.AppendText("Measuring..." + Environment.NewLine);
+
+                if (mode == "DCS")
+                {
+                    // Allocate all channels to current Rx...
+                    for (int ch = 0; ch < 18; ch++)
+                    {
+                        _ = FSK.DeallocateChannel(usb, 'F', r, ch);
+                        bool success = FSK.AllocateChannel(usb, 'F', r, ch);
+                        if (!success) MessageBox.Show("Failed to allocate channel " + ch.ToString());
+                    }
+                }
+
+                foreach (string l in LNBs)
+                {
+                    if (chIntervene.Checked)
+                        MessageBox.Show("Attach LNB " + l);
+
+                    foreach (bool isUpper in new[] { false, true })
+                    {
+                        if (mode == "DCS")
+                        {
+                            foreach (decimal inputFrequency in (isUpper ? upperTransponders : lowerTransponders))
+                            {
+                                // Send the current tp to every UB...
+                                int KHz = Convert.ToInt32(1000 * inputFrequency);
+                                if (l == "C" && isUpper)
+                                    KHz += 28500;       // Neither understand nor like this. Must add 28.5 MHz!
+
+                                for (int ch = 0; ch < 18; ch++)
+                                {
+                                    bool success = FSK.Command38(usb, 'F', r, l, ch, KHz, isUpper, null);
+                                    if (!success) MessageBox.Show("Failed to allocate frequency to channel " + ch.ToString());
+                                }
+                            }
+
+                            rtbWhiteboard.AppendText(r.ToString() + ", from LNB " + l + (isUpper ? " Upper, " : " Lower, ") + Environment.NewLine);
+                            rtbWhiteboard.Refresh();
+                            rtbWhiteboard.Update();
+                            rtbWhiteboard.SelectionStart = rtbWhiteboard.Text.Length;
+                            rtbWhiteboard.ScrollToCaret();
+
+                            foreach (decimal ub in dcsGrid)
+                            {
+                                //  ---------------------  Take the measurements  ---------------------------------------
+
+                                string dataRow = l.PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4);
+
+                                string message = string.Format(":FREQuency:CENTer {0} MHz", ub);
+                                instruments[SpecAn1].WriteString(message);
+                                instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
+                                _ = instruments[SpecAn1].ReadString();
+
+                                message = ":INPUT ANALOG:RANGE:AUTO";
+                                instruments[SpecAn1].WriteString(message);
+                                instruments[SpecAn1].WriteString("*OPC?");    // Prevents further action until operation has completed
+                                _ = instruments[SpecAn1].ReadString();
+
+                                double[] temp = new double[(int)numAverages.Value];
+                                try
+                                {
+                                    for (int av = 0; av < (int)numAverages.Value; av++)
+                                    {
+                                        Thread.Sleep(100);
+                                        instruments[SpecAn1].WriteString(traceName + ":DATA:TABL?  'SigToNoise'");
+                                        instruments[SpecAn1].WriteString(":DATA:TABL?  \"SigToNoise\"");
+                                        temp[av] = double.Parse(instruments[SpecAn1].ReadString());
+                                    }
+                                }
+                                catch (COMException ex)
+                                {
+                                    MessageBox.Show(ex.ToString());
+                                    return;
+                                }
+                                mers.Rows.Add(ub.ToString(), Math.Round(temp.Average(), 2));
+                                dgvMERs.Refresh();
+                                dgvMERs.Update();
+                                dgvMERs.FirstDisplayedScrollingRowIndex = dgvMERs.RowCount - 1;
+
+                                // Save results to a file...
+
+                                dataRow += ub.ToString().PadRight(17) + ub.ToString().PadRight(17) + Math.Round(temp.Average(), 2);
+                                File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
+                                progressBar1.Value += 1;
+                            }
+                        }
+                        else
+                        {
+                            foreach (string b in bands)
+                            {
+                                // Set up the Destacker
+                                bool success = FSK.Command38(usb, 'D', r, l, null, null, isUpper, b);
+
+                                rtbWhiteboard.AppendText("Rx" + r.ToString() + ", from LNB-" + l + (isUpper ? "-Upper, " : "-Lower, ") + "to " + b + Environment.NewLine);
+                                rtbWhiteboard.Refresh();
+                                rtbWhiteboard.Update();
+
+                                foreach (decimal inputFrequency in (isUpper ? upperTransponders : lowerTransponders))
+                                {
+                                    // Calculate where the S/A needs to look...
+                                    specAnCentreFreq = CalculateDestackerFrequency(inputFrequency, isUpper, b);
+
+                                    string dataRow = opticalPower.PadRight(10) + l.PadRight(4) + (isUpper ? "Upper" : "Lower").PadRight(6) + r.ToString().PadRight(4) + b.PadRight(7);
+
+                                    // Set the spectrum analyser frequency...
+                                    vsa.Centre = specAnCentreFreq;
+
+                                    double merResult;
+                                    vsa.PerformSweep(50, true);
+                                    merResult = vsa.MeasureMER(traceName);
+
+                                    // Record the measurement in the dgv
+                                    mers.Rows.Add(inputFrequency.ToString(), Math.Round(merResult, 2));
+                                    dgvMERs.FirstDisplayedScrollingRowIndex = dgvMERs.RowCount - 1;
+                                    dgvMERs.Refresh();
+                                    dgvMERs.Update();
+
+                                    // Save the result to a file...
+                                    dataRow += inputFrequency.ToString().PadRight(12) + specAnCentreFreq.ToString().PadRight(12) + Math.Round(merResult, 2);
+                                    File.AppendAllText(resultsFile, dataRow + Environment.NewLine);
+                                    progressBar1.Value += 1;
+                                }
+                            }
+                        }
+                    }
+                    File.AppendAllText(resultsFile, "------------------------------------------------------------" + Environment.NewLine);
+                }
+            }
+
+            RenameResultsFile("MER-" + mode, ports, serialNumber, "MER", temperature);
+        }
         private void bMERDcs_Click(object sender, EventArgs e)
         {
             // Gather the basic parameters of the test...
@@ -1791,13 +2156,31 @@ namespace TestProg
             Binstrument_Click(bSA, new EventArgs());
             int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
 
-            int selectedTraceNo = Setup89601VSA();
+            //int selectedTraceNo = Setup89601VSA();
+
+
+            // --------------------- create an instance of a VSA -------------------------------------------------------
+
+            VSA89601 vsa = new VSA89601(cbInstrumentSA1.SelectedItem.ToString());
+
+            rtbWhiteboard.AppendText("VSA process returns " + vsa.QueryVsaRunning() + Environment.NewLine);
+            vsa.DisplayOn = true;
+            vsa.AutoCal = false;
+            vsa.ActiveMeasurement = "DDEMod";
+            vsa.InputMode = "HW";
+            vsa.Modulation = "8PSK";
+            vsa.Baud = "21.5";
+            vsa.Centre = 1000;
+            vsa.Span = 60;
+            int selectedTraceNo = vsa.SeekTrace("Syms/Errs");
 
             if (selectedTraceNo == 0)
             {
                 rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
                 return;
             }
+            else rtbWhiteboard.AppendText("Using trace " + selectedTraceNo.ToString() + Environment.NewLine);
+
             string traceName = "TRACE" + selectedTraceNo;
 
             // -------------------------  Setup the transponder frequencies  ------------------------------
@@ -1963,13 +2346,29 @@ namespace TestProg
             Binstrument_Click(bSA, new EventArgs());
             int SpecAn1 = instrumentLog.FindIndex(element => element == "SA1");
 
-            int selectedTraceNo = Setup89601VSA();
+
+            // --------------------- create an instance of a VSA -------------------------------------------------------
+
+            VSA89601 vsa = new VSA89601(cbInstrumentSA1.SelectedItem.ToString());
+
+            rtbWhiteboard.AppendText("VSA process returns " + vsa.QueryVsaRunning() + Environment.NewLine);
+            vsa.DisplayOn = true;
+            vsa.AutoCal = false;
+            vsa.ActiveMeasurement = "DDEMod";
+            vsa.InputMode = "HW";
+            vsa.Modulation = "8PSK";
+            vsa.Baud = "21.5";
+            vsa.Centre = 1000;
+            vsa.Span = 60;
+            int selectedTraceNo = vsa.SeekTrace("Syms/Errs");
 
             if (selectedTraceNo == 0)
             {
                 rtbWhiteboard.AppendText("No suitable Trace found" + Environment.NewLine);
                 return;
             }
+            else rtbWhiteboard.AppendText("Using trace " + selectedTraceNo.ToString() + Environment.NewLine);
+
             string traceName = "TRACE" + selectedTraceNo;
 
             // -------------------------  Setup the transponder frequencies  ------------------------------
